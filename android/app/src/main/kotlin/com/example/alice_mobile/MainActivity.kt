@@ -1,4 +1,4 @@
-package com.example.alice
+package com.pasteleria.alice
 
 import io.flutter.embedding.android.FlutterActivity
 

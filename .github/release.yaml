@@ -1,0 +1,361 @@
+name: 📱 Mobile Release
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: "Release version (format: x.x.x+y)"
+        required: true
+permissions:
+  contents: write
+jobs:
+  release:
+    name: Build and Release iOS to TestFlight
+    runs-on: macos-14
+    timeout-minutes: 60
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v4
+      - name: 💾 Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.5'
+      - name: 🧪 Validate version format
+        run: |
+          echo "Release version: ${{ github.event.inputs.release_version }}"
+          if [[ ! "${{ github.event.inputs.release_version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\+[0-9]+$ ]]; then
+            echo "❌ Invalid version format. Must be x.x.x+y (e.g. 1.2.3+4)"
+            exit 1
+          fi
+      - name: 🧪 Extract version and build number
+        run: |
+          version="${{ github.event.inputs.release_version }}" # x.x.x+y
+          version_part="${version%%+*}" # Extracts x.x.x
+          build_number="${version#*+}" # Extracts y
+          echo "Version: $version_part"
+          echo "Build Number: $build_number"
+          echo "VERSION=$version_part" >> $GITHUB_ENV
+          echo "BUILD_NUMBER=$build_number" >> $GITHUB_ENV
+          echo "ENVIRONMENT=Dev" >> $GITHUB_ENV
+      - name: 🔧 Update pubspec.yaml version
+        run: |
+          version="${{ github.event.inputs.release_version }}"
+          sed -i "" "s/^version: .*/version: $version/" pubspec.yaml
+          echo "✅ pubspec.yaml updated to version: $version"
+
+      - name: 🔐 Create .env file from secret (Dev)
+        run: |
+
+          if [ -z "${{ secrets.FLUTTER_ENV_DEV_BASE64 }}" ]; then
+            echo "❌ FLUTTER_ENV_DEV_BASE64 secret is not set."
+            exit 1
+          fi
+          echo "${{ secrets.FLUTTER_ENV_DEV_BASE64 }}" | base64 --decode > .env
+          echo "✅ .env file created for development environment"
+      - name: 📂 Create google json key file from secret (Dev)
+        run: |
+          if [ -z "${{ secrets.GOOGLE_SERVICE_JSON_DEV_BASE64 }}" ]; then
+            echo "❌ GOOGLE_SERVICE_JSON_DEV_BASE64 secret is not set."
+            exit 1
+          fi
+          echo "${{ secrets.GOOGLE_SERVICE_JSON_DEV_BASE64 }}" | base64 --decode > android/app/google-services.json
+          echo "✅ google-services.json file created for development environment"
+      - name: 📂 Create GoogleService-Info.plist file from secret (dev)
+        run: |
+          if [ -z "${{ secrets.GOOGLE_SERVICE_PLIST_DEV_BASE64 }}" ]; then
+            echo "❌ GOOGLE_SERVICE_PLIST_DEV_BASE64 secret is not set."
+            exit 1
+          fi
+          echo "${{ secrets.GOOGLE_SERVICE_PLIST_DEV_BASE64 }}" | base64 --decode > ios/Runner/GoogleService-Info.plist
+          echo "✅ GoogleService-Info.plist file created for development environment"
+      # -------- iOS STEPS --------
+
+      - name: 🍏 Set up Ruby (for Fastlane)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+      - name: 📦 Install Fastlane
+        run: gem install fastlane
+      - name: 📥 Get Flutter dependencies
+        run: |
+          flutter clean
+          flutter pub get
+      - name: 📦 Install CocoaPods dependencies
+        working-directory: ios
+        run: |
+          pod repo update
+          pod install
+      - name: 🐛 Patch Flutter Xcode run script for debug
+        run: |
+          sed -i '' "s/\$FLUTTER_ROOT\/packages\/flutter_tools\/bin\/xcode_backend.sh build/\$FLUTTER_ROOT\/packages\/flutter_tools\/bin\/xcode_backend.sh build || true/g" ios/Runner.xcodeproj/project.pbxproj
+      
+      - name: 🔧 Update iOS version and build number in Info.plist
+        run: |
+          # Update the version
+          version="${{ env.VERSION }}"
+          build_number="${{ env.BUILD_NUMBER }}"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $version" ios/Runner/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $build_number" ios/Runner/Info.plist
+          echo "✅ Info.plist updated with version $version and build number $build_number"
+      - name: 🔐 Set up code signing certificate and provisioning profile
+        run: |
+          echo "${{ secrets.DIST_CERTIFICATE_BASE64 }}" | base64 --decode > dist_cert.p12
+          echo "${{ secrets.PROVISIONING_PROFILE_BASE64 }}" | base64 --decode > PHIT_Distribution.mobileprovision
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import dist_cert.p12 -k build.keychain -P "${{ secrets.DIST_CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign -T /usr/bin/xcodebuild
+          security set-key-partition-list -S apple-tool:,apple:,codesign:,xcodebuild:,xcrun: -s -k "" build.keychain
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          PROFILE_PLIST=$(/usr/bin/security cms -D -i PHIT_Distribution.mobileprovision)
+          UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /dev/stdin <<< "$PROFILE_PLIST")
+          TEAM_ID=$(/usr/libexec/PlistBuddy -c "Print :TeamIdentifier:0" /dev/stdin <<< "$PROFILE_PLIST")
+          cp PHIT_Distribution.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
+          echo "PROVISIONING_PROFILE_UUID=$UUID" >> $GITHUB_ENV
+          echo "TEAM_ID=$TEAM_ID" >> $GITHUB_ENV
+          echo "✅ Provisioning Profile UUID: $UUID"
+          echo "✅ Team ID: $TEAM_ID"
+          
+          # Export for Python script to use
+          export PROVISIONING_PROFILE_UUID=$UUID
+          
+          # Change Automatic signing to Manual for CI build only (Release config specifically)
+          echo "🔧 Converting Automatic→Manual signing for Release configuration..."
+          
+          # Create Python script to surgically modify only the Release configuration
+          cat > fix_signing.py << 'EOF'
+          import re
+          import os
+          
+          # Get the provisioning profile UUID from environment
+          profile_uuid = os.environ.get('PROVISIONING_PROFILE_UUID', '')
+          
+          # Read the project file
+          with open('ios/Runner.xcodeproj/project.pbxproj', 'r') as f:
+              content = f.read()
+          
+          # Find the Release configuration block for Runner target
+          lines = content.split('\n')
+          in_release_block = False
+          modified_lines = []
+          block_depth = 0
+          
+          for i, line in enumerate(lines):
+              # Detect when we enter a Release configuration block
+              if '/* Release */ = {' in line or 'name = Release;' in line:
+                  in_release_block = True
+                  block_depth = 0
+              
+              # Track braces to know when we exit the block
+              if in_release_block:
+                  block_depth += line.count('{') - line.count('}')
+                  
+                  # Make modifications only within Release blocks
+                  if 'CODE_SIGN_STYLE = Automatic;' in line:
+                      line = line.replace('CODE_SIGN_STYLE = Automatic;', 'CODE_SIGN_STYLE = Manual;')
+                      print(f"✓ Changed CODE_SIGN_STYLE to Manual")
+                  elif 'CODE_SIGN_IDENTITY = "Apple Development";' in line:
+                      line = line.replace('CODE_SIGN_IDENTITY = "Apple Development";', 'CODE_SIGN_IDENTITY = "Apple Distribution";')
+                      print(f"✓ Changed CODE_SIGN_IDENTITY to Apple Distribution")
+                  elif 'PROVISIONING_PROFILE_SPECIFIER = "";' in line and profile_uuid:
+                      line = line.replace('PROVISIONING_PROFILE_SPECIFIER = "";', f'PROVISIONING_PROFILE_SPECIFIER = {profile_uuid};')
+                      print(f"✓ Set PROVISIONING_PROFILE_SPECIFIER to {profile_uuid}")
+                  
+                  # Exit block when we're back to depth 0
+                  if block_depth == 0:
+                      in_release_block = False
+              
+              modified_lines.append(line)
+          
+          # Write back
+          with open('ios/Runner.xcodeproj/project.pbxproj', 'w') as f:
+              f.write('\n'.join(modified_lines))
+          
+          print("✅ Project configured for Manual signing in Release configuration")
+          EOF
+          
+          python3 fix_signing.py
+          rm fix_signing.py
+      - name: 🧪 Prepare App Store Connect API Key
+        run: echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" | base64 --decode > ios/AuthKey.p8
+      - name: 🧾 Debug - Check AuthKey.p8 existence and content
+        run: |
+          ls -l ios/AuthKey.p8 || echo "AuthKey.p8 file does not exist"
+          cat ios/AuthKey.p8 || echo "AuthKey.p8 is empty"
+      - name: 🧾 Debug Check API Key and Issuer ID
+        run: |
+          echo "APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}"
+          echo "APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}"
+      - name: ✅ Accept Xcode license
+        run: sudo xcodebuild -license accept
+      - name: 🔍 Check UUID and Team ID before build
+        run: |
+          echo "Provisioning UUID: $PROVISIONING_PROFILE_UUID"
+          echo "Team ID: $TEAM_ID"
+        shell: bash
+        env:
+          PROVISIONING_PROFILE_UUID: ${{ env.PROVISIONING_PROFILE_UUID }}
+          TEAM_ID: ${{ env.TEAM_ID }}
+      - name: 🧪 Explicitly select Xcode 16.2
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
+      - name: 🧠 Debug - Check Xcode, SDK, and Flutter versions
+        run: |
+          echo "▶️ Xcode version:"
+          xcodebuild -version
+          echo "▶️ Available SDKs:"
+          xcodebuild -showsdks
+          echo "▶️ iOS SDK version from xcrun:"
+          xcrun --sdk iphoneos --show-sdk-version
+          echo "▶️ Flutter version:"
+          flutter --version
+          # 🚨 SDK enforcement
+          REQUIRED_SDK="18.0"
+          ACTUAL_SDK=$(xcrun --sdk iphoneos --show-sdk-version)
+          if [[ "$(printf '%s\n' "$REQUIRED_SDK" "$ACTUAL_SDK" | sort -V | head -n1)" != "$REQUIRED_SDK" ]]; then
+            echo "❌ SDK version $ACTUAL_SDK is too old. Require iOS SDK >= $REQUIRED_SDK."
+            exit 1
+          else
+            echo "✅ iOS SDK version is $ACTUAL_SDK — good to go."
+          fi
+
+      - name: 🚀 Build and upload to TestFlight (with timeout + verbose)
+        working-directory: ios
+        timeout-minutes: 30
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          PROVISIONING_PROFILE_UUID: ${{ env.PROVISIONING_PROFILE_UUID }}
+          TEAM_ID: ${{ env.TEAM_ID }}
+          CI: true
+          LANG: en_US.UTF-8
+          LC_ALL: en_US.UTF-8
+        run: |
+          set -e
+          echo "⚙️ Forcing verbose Flutter Xcode build..."
+          sed -i '' 's|/bin/sh "$FLUTTER_ROOT.*"|set -x\nexec 1\>\&2\n/bin/sh -x "$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh" build|' Runner.xcodeproj/project.pbxproj || true
+          echo "🚀 Starting Fastlane build..."
+          fastlane release --verbose || { echo '❌ Fastlane failed'; exit 1; }
+
+
+
+      # -------- ANDROID STEPS -------- #
+
+      # - name: 🧱 Decode keystore from base64
+      #   run: |
+      #     echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/release-key.jks
+      # - name: 🧪 Update release keystore values in key.properties
+      #   run: |
+      #     store_pass="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+      #     key_pass="${{ secrets.ANDROID_KEY_PASSWORD }}"
+      #     key_alias="${{ secrets.ANDROID_KEY_ALIAS }}"
+      #     store_file="release-key.jks"
+      
+      #     if [[ "$store_pass" == "none" ]]; then store_pass=""; fi
+      #     if [[ "$key_pass" == "none" ]]; then key_pass=""; fi
+      #     if [ ! -f android/key.properties ]; then
+      #     touch android/key.properties
+      #     fi 
+
+      #     set_key() {
+      #       key="$1"
+      #       value="$2"
+      #       if grep -q "^$key=" android/key.properties; then
+      #         sed -i'' -e "s|^$key=.*|$key=$value|" android/key.properties
+      #       else
+      #         echo "$key=$value" >> android/key.properties
+      #       fi
+      #     }  
+
+      #     set_key "StorePassword" "$store_pass"
+      #     set_key "KeyPassword" "$key_pass"
+      #     set_key "KeyAlias" "$key_alias"
+      #     set_key "StoreFile" "$store_file"
+      # - name: 🔧 Update Android version and build number in build.gradle
+      #   run: |
+      #     version="${{ env.VERSION }}"
+      #     build_number="${{ env.BUILD_NUMBER }}"
+      
+      #     sed -i '' "s/versionCode flutter.versionCode/versionCode $build_number/" android/app/build.gradle
+      #     sed -i '' "s/versionName flutter.versionName/versionName \"$version\"/" android/app/build.gradle
+
+      #     echo "✅ Android build.gradle updated with versionName $version and versionCode $build_number"
+
+
+
+
+
+
+      # - name: 🔨 Build signed Android APK
+      #   run: |
+      #     if [ "$ENVIRONMENT" = "Prod" ]; then
+      #       echo "Building signed APK for Production..."
+      #       flutter build appbundle --release
+      #     elif [ "$ENVIRONMENT" = "Dev" ]; then
+      #       echo "Building signed APK for Development..."
+      #       flutter build apk --release
+      #     else
+      #       echo "Unknown ENVIRONMENT: $ENVIRONMENT"
+      #     fi
+          
+
+      # - name: 🚀 Upload to Firebase App Distribution (CLI)
+      #   run: |
+      #     curl -sL https://firebase.tools | bash
+
+      #     echo "ENVIRONMENT=$ENVIRONMENT"
+      #     if [ "$ENVIRONMENT" = "Prod" ]; then
+      #       echo "Uploading AAB to Firebase App Distribution (Prod)..."
+      #       firebase appdistribution:distribute build/app/outputs/bundle/release/app-release.aab \
+      #       --app "${{ secrets.FIREBASE_APP_ID_PROD }}" \
+      #       --token "${{ secrets.FIREBASE_CLI_TOKEN }}" \
+      #       --groups "BlueSkyAi"
+      #     elif [ "$ENVIRONMENT" = "Dev" ]; then
+      #       echo "Uploading APK to Firebase App Distribution (Dev)..."
+      #       firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
+      #       --app "${{ secrets.FIREBASE_APP_ID_DEV }}" \
+      #       --token "${{ secrets.FIREBASE_CLI_TOKEN }}" \
+      #       --groups "BlueSkyAi"
+      #     else
+      #       echo "Skipping Firebase App Distribution: ENVIRONMENT=${ENVIRONMENT} not recognized"
+      #     fi
+
+
+
+
+
+      # - name: 🔨 Build signed Android APK
+      #   run: |
+      #     flutter build apk --release
+          
+      # - name: 🚀 Upload to Firebase App Distribution (CLI)
+      #   run: |
+      #     curl -sL https://firebase.tools | bash
+      #       firebase appdistribution:distribute build/app/outputs/flutter-apk/app-release.apk \
+      #       --app "${{ secrets.FIREBASE_APP_ID_DEV }}" \
+      #       --token "${{ secrets.FIREBASE_CLI_TOKEN }}" \
+      #       --groups "BlueSkyAi"
+
+
+      #       # -------- FINAL: TAG & RELEASE --------
+
+            
+      - name: 🧹 Clean up API key
+        run: rm ios/AuthKey.p8 || true
+      - name: 🏷️ Tag the release
+        run: |
+          git config --global user.name "Sebastian Vasquez"
+          git config --global user.email "sebastian@blueskyai.co"
+          git fetch --prune --unshallow
+
+          git tag "v${{ github.event.inputs.release_version }}-${{env.ENVIRONMENT}}"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} --tags
+      - name: 📰 Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ github.event.inputs.release_version }}-${{env.ENVIRONMENT}}"
+          generate_release_notes: true
+      - name: 🧾 Upload Xcode build logs if build fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcode-build-log
+          path: ~/Library/Logs/gym/
