@@ -1,0 +1,12 @@
+description: This file stores settings for Dart & Flutter DevTools.
+documentation: https://docs.flutter.dev/tools/devtools/extensions#configure-extension-enablement-states
+devtools:
+  enableExperiments: true
+  showInspector: true
+  theme: dark
+  performanceOverlay: false
+  showMemoryChart: true
+  showLogging: true
+  showNetwork: true
+  showCpuProfiler: true
+  showSourceReport: true

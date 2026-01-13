@@ -1,0 +1,72 @@
+plugins {
+    id("com.android.application")
+    id("kotlin-android")
+    id("dev.flutter.flutter-gradle-plugin")
+}
+def keystoreProperties = new Properties()
+def keystoreFile = rootProject.file("key.properties")
+if (keystoreFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystoreFile))
+}
+android {
+    namespace = "com.pasteleria.alice"
+    compileSdk 36
+    ndkVersion = "27.0.12077973"
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    defaultConfig {
+        applicationId = "com.pasteleria.alice"
+        minSdk 24
+        targetSdk 35
+        resConfigs "en"
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
+
+    signingConfigs {
+    release {
+            keyAlias keystoreProperties['KeyAlias']
+            keyPassword keystoreProperties['KeyPassword']
+            storeFile file(keystoreProperties['StoreFile'])
+            storePassword keystoreProperties['StorePassword']
+        }
+    debug {
+            keyAlias keystoreProperties['KeyAlias']
+            keyPassword keystoreProperties['KeyPassword']
+            storeFile file(keystoreProperties['StoreFile'])
+            storePassword keystoreProperties['StorePassword']
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+apply plugin: 'com.google.gms.google-services'
