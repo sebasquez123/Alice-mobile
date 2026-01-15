@@ -42,14 +42,24 @@ Future<void> config() async {
 }
 
 class LoggerConfig {
-   Logger get print => Logger(
-    printer: PrettyPrinter(
+  final String instanceName;
+  late Logger logger;
+  LoggerConfig({ required this.instanceName }){
+
+    final config = PrettyPrinter(
         methodCount: 0,
         colors: true,
-        printEmojis: true,
+        printEmojis: false,
         lineLength: 90
-    ),
-  );
+    );
+    logger = Logger(printer: config);
+  }
+
+  void warning(String message) => logger.w('[$instanceName] Warning: $message');
+  void info(String message) => logger.i('[$instanceName] Info: $message');
+  void error(String message) => logger.e('[$instanceName] Error: $message');
+  void critical(String message) => logger.f('[$instanceName] Critical: $message');
+  void debug(String message) => logger.d('[$instanceName] Debug: $message');
 }
 
 class AppConfig {
