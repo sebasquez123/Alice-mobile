@@ -1,4 +1,10 @@
+import 'package:alice/config.dart';
+import 'package:alice/navigator.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+
+final logger = LoggerConfig(instanceName: 'Quotation');
 
 class QuotationScreen extends StatefulWidget {
   const QuotationScreen({super.key});
@@ -10,16 +16,31 @@ class QuotationScreen extends StatefulWidget {
 class _QuotationScreenState extends State<QuotationScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.onSecondary,
       appBar: AppBar(
-        title: const Text('Quotation'),
+        title: const Text('Alice'),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) => Center(
-            child: Text(
-              'Welcome to Quotation',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+          child: Column(
+            children: [
+              Text(
+                'Quotation page!',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                            onPressed: () => context.replaceNamed(Routes.home),
+                            child: const Text('Go home'),
+                          ),
+                ],
+              ),
+              
+            ],
           ),
+        ),
       ),
     );
 }

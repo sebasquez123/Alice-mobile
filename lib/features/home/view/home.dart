@@ -2,8 +2,10 @@ import 'package:alice/config.dart';
 import 'package:alice/features/home/domain/bloc/home.bloc.dart';
 import 'package:alice/features/home/domain/data/home.state.dart';
 import 'package:alice/features/home/domain/events/home.events.dart';
+import 'package:alice/navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 
 final logger = LoggerConfig(instanceName: 'Home');
@@ -26,9 +28,13 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context, constraints) => Center(
           child: Column(
             children: [
+              Text(
+                'Welcome to Alice!',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
               BlocConsumer<FactionBloc, FactionState>(
                 listener: (context, state) {
-                  logger.critical('Faction state changed: ${state.toString()}');
+                  logger.info('Faction changed to: ${state.faction}');
                 },
                 builder: (context, state) => Column(
                     children: [
@@ -43,10 +49,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
               ),
-              Text(
-                'Welcome to Alice!',
-                style: Theme.of(context).textTheme.headlineMedium,
+              Column(
+                spacing: 10,
+                children: [
+                  ElevatedButton(
+                            onPressed: () => context.replaceNamed(Routes.settings),
+                            child: const Text('Go settings'),
+                          ),
+                  ElevatedButton(
+                        onPressed: () => context.replaceNamed(Routes.quotation),
+                        child: const Text('Go quotation'),
+                      ),
+                  ElevatedButton(
+                    onPressed: () => context.replaceNamed(Routes.signIn),
+                    child: const Text('Go signin'),
+                  ),
+                ],
               ),
+              
             ],
           ),
         ),

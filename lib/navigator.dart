@@ -12,16 +12,18 @@ import 'package:go_router/go_router.dart';
 final logger = LoggerConfig(instanceName: 'Navigator');
 
 class Routes {
-  static const String home = '/';
+  static const String home = '/home';
   static const String signIn = '/sign-in';
   static const String quotation = '/quotation';
   static const String settings = '/settings';
 }
 
+
 final GoRouter router = GoRouter(
+  initialLocation: Routes.home,
   routes: [
     GoRoute(
-      name: 'home',
+      name: Routes.home,
       path: Routes.home,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: const _AppNavigator(
@@ -32,7 +34,7 @@ final GoRouter router = GoRouter(
       ),
     ),
     GoRoute(
-      name: 'sign-in',
+      name: Routes.signIn,
       path: Routes.signIn,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: const _AppNavigator(
@@ -43,7 +45,7 @@ final GoRouter router = GoRouter(
       ),
     ),
     GoRoute(
-      name: 'quotation',
+      name: Routes.quotation,
       path: Routes.quotation,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: const _AppNavigator(
@@ -54,7 +56,7 @@ final GoRouter router = GoRouter(
       ),
     ),
     GoRoute(
-      name: 'settings',
+      name: Routes.settings,
       path: Routes.settings,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: const _AppNavigator(
@@ -89,14 +91,16 @@ class _AppNavigator extends StatelessWidget {
 
 Future<void> leaveAppFromNative(BuildContext context, bool didpop) async {
     if (didpop) return;
-    final currentPath = GoRouter.of(context).state.name;
+    final currentPath = GoRouter.of(context).state.path;
     switch (currentPath) {
+      case Routes.home:
+        logger.info('Exiting app from home');
+        exit(0);
+
       case Routes.signIn:
         logger.info('Walking from sign-in to home');
         context.replaceNamed(Routes.home);
         break;
-      case Routes.home:
-        exit(0);
 
       case Routes.quotation:
         logger.info('Walking from quotation screen to home');
