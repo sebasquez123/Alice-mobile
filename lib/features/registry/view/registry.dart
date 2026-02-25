@@ -5,16 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 
-final logger = LoggerConfig(instanceName: 'Login');
+final logger = LoggerConfig(instanceName: 'Registry');
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegistryScreen extends StatefulWidget {
+  const RegistryScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegistryScreen> createState() => _RegistryScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegistryScreenState extends State<RegistryScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onSecondary,
@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             children: [
               Text(
-                'Login page!',
+                'Registry page!',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               Column(

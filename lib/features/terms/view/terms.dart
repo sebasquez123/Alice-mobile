@@ -1,31 +1,33 @@
 import 'package:alice/config.dart';
 import 'package:alice/navigator.dart';
+import 'package:alice/widgets/components/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 
-final logger = LoggerConfig(instanceName: 'Settings');
+final logger = LoggerConfig(instanceName: 'Terms');
 
-class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+class TermsScreen extends StatefulWidget {
+  const TermsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  State<TermsScreen> createState() => _TermsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _TermsScreenState extends State<TermsScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onSecondary,
-      appBar: AppBar(
-        title: const Text('Alice'),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(130.0),
+        child: TopAppBar(),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) => Center(
           child: Column(
             children: [
               Text(
-                'Settings page!',
+                'Terms page!',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               Column(

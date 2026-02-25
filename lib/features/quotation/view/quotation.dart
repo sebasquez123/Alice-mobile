@@ -1,5 +1,6 @@
 import 'package:alice/config.dart';
 import 'package:alice/navigator.dart';
+import 'package:alice/widgets/components/appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -17,8 +18,9 @@ class _QuotationScreenState extends State<QuotationScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onSecondary,
-      appBar: AppBar(
-        title: const Text('Alice'),
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(130.0),
+        child: TopAppBar(),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) => Center(
