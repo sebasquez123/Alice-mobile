@@ -15,16 +15,17 @@ dependencies:
   
   app_links: 6.4.0
   flutter_bloc: 9.1.1
-  cloud_firestore: 5.6.12
+  cloud_firestore: 6.1.1
   connectivity_plus: 6.1.3
   collection: 1.19.1
   cupertino_icons: 1.0.2
   expandable: 5.0.1
   equatable: 2.0.8
   ffi: 2.1.3 
-  firebase_auth: 5.7.0
-  firebase_core: 3.15.2
-  firebase_storage: 12.4.10
+  firebase_auth: 6.1.3
+  firebase_core: 4.3.0
+  firebase_storage: 13.0.5
+  firebase_performance: 0.11.1+3
   file_picker: 9.2.3
   flutter_markdown_selectionarea: 0.6.17+1
   flutter_launcher_icons: 0.14.4
@@ -96,11 +97,11 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path_android: "assets/images/alice_app_icon.png"
-  adaptive_icon_foreground: "assets/images/alice_app_icon.png"
+  image_path_android: "assets/alice_app_icon.png"
+  adaptive_icon_foreground: "assets/alice_app_icon.png"
   min_sdk_android: 21
   remove_alpha_ios: true
-  image_path_ios: "assets/images/alice_app_icon.png"
+  image_path_ios: "assets/alice_app_icon.png"
   
 flutter_native_splash:
   android: true

@@ -1,4 +1,11 @@
+import 'package:alice/config.dart';
+import 'package:alice/navigator.dart';
+import 'package:alice/widgets/components/appbar.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+
+final logger = LoggerConfig(instanceName: 'Login');
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,16 +17,32 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
+      backgroundColor: Theme.of(context).colorScheme.onSecondary,
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(130.0),
+        child: TopAppBar(),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) => Center(
-            child: Text(
-              'Welcome to Login',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+          child: Column(
+            children: [
+              Text(
+                'Login page!',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                            onPressed: () => context.replaceNamed(Routes.home),
+                            child: const Text('Go home'),
+                          ),
+                ],
+              ),
+              
+            ],
           ),
+        ),
       ),
     );
 }
