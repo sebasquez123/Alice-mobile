@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:alice/config.dart';
+import 'package:alice/daddy.dart';
 import 'package:alice/features/home/view/home.dart';
 import 'package:alice/features/login/view/login.dart';
 import 'package:alice/features/quotation/view/quotation.dart';
@@ -134,17 +135,12 @@ class _AppNavigator extends StatelessWidget {
   const _AppNavigator({
     required this.child,
   });
-  
+
   @override
   Widget build(BuildContext context) => PopScope(
         canPop: false,
         onPopInvokedWithResult: (didpop, result) async => leaveAppFromNative(context, didpop),
-        child: Scaffold(
-          backgroundColor: const Color.fromARGB(255, 255, 97, 250),
-          body: Center(
-            child: child,
-          ),
-        ),
+        child: DaddyScreen(child: child),
       );
 }
 
@@ -157,22 +153,22 @@ Future<void> leaveAppFromNative(BuildContext context, bool didpop) async {
         exit(0);
 
       case Routes.signIn:
-        logger.info('Walking from sign-in to home');
+        logger.info('Navigating from sign-in to home');
         context.replaceNamed(Routes.home);
         break;
 
       case Routes.quotation:
-        logger.info('Walking from quotation screen to home');
+        logger.info('Navigating from quotation screen to home');
         context.replaceNamed(Routes.home);
         break;
       
       case Routes.quoteRegistry:
-        logger.info('Walking from quote registry screen to home');
+        logger.info('Navigating from quote registry screen to home');
         context.replaceNamed(Routes.home);
         break;
 
       case Routes.terms:
-        logger.info('Walking from terms screen to home');
+        logger.info('Navigating from terms screen to home');
         context.replaceNamed(Routes.home);
         break;
 

@@ -3,7 +3,6 @@ import 'package:alice/features/home/domain/bloc/home.bloc.dart';
 import 'package:alice/features/home/domain/data/home.state.dart';
 import 'package:alice/features/home/domain/events/home.events.dart';
 import 'package:alice/navigator.dart';
-import 'package:alice/widgets/components/appbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,7 +21,6 @@ class HomeScreenState extends State<HomeScreen> {
   ScrollController scrollController = ScrollController();
   FocusNode textGroupedListFocusNode = FocusNode(); 
   bool isLoading = false;
-  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -36,14 +34,7 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-      appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(130.0),
-        child: TopAppBar(),
-      ),
-      key: scaffoldKey,
-      backgroundColor: const Color.fromARGB(255, 255, 240, 253),
-      body: LayoutBuilder(
+  Widget build(BuildContext context) => LayoutBuilder(
         builder: (context, constraints) {
           constraints.maxHeight;
           constraints.maxWidth;
@@ -60,7 +51,5 @@ class HomeScreenState extends State<HomeScreen> {
               ),
             );
         }
-      ),
-          
-    );
+      );
 }
