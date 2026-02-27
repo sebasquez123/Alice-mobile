@@ -16,13 +16,7 @@ class RegistryScreen extends StatefulWidget {
 
 class _RegistryScreenState extends State<RegistryScreen> {
   @override
-  Widget build(BuildContext context) => Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.onSecondary,
-      appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(130.0),
-        child: TopAppBar(),
-      ),
-      body: LayoutBuilder(
+  Widget build(BuildContext context) => LayoutBuilder(
         builder: (context, constraints) => Center(
           child: Column(
             children: [
@@ -43,6 +37,5 @@ class _RegistryScreenState extends State<RegistryScreen> {
             ],
           ),
         ),
-      ),
     );
 }
