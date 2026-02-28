@@ -2,10 +2,20 @@ import 'package:alice/navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class TopAppBar extends StatelessWidget {
+class TopAppBar extends StatefulWidget {
   const TopAppBar({ super.key });
+  
   @override
-  Widget build(BuildContext context) =>Column(
+  State<TopAppBar> createState() => _TopAppBarState();
+}
+
+class _TopAppBarState extends State<TopAppBar> {
+  
+
+  @override
+  Widget build(BuildContext context){ 
+    final routerDelegate = GoRouter.of(context).routerDelegate;
+    return Column(
       children: [
         Column(
           children: [
@@ -35,44 +45,47 @@ class TopAppBar extends StatelessWidget {
                 height: 1,
               ),
             ),
-            Container(
-              color: const Color.fromARGB(255, 255, 255, 255),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: pageObjects.map<Widget>((pageObject) {
-                  final isActive = pageObject.pageRedirectPath == GoRouter.of(context).state.path;
-                  return Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: isActive ? const Color(0xFFFF86C8) : Colors.transparent,
-                          width: 3,
+            AnimatedBuilder(
+              animation: routerDelegate,
+              builder: (context, _) => Container(
+                  color: const Color.fromARGB(255, 255, 255, 255),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: pageObjects.map<Widget>((pageObject) {
+                      final isActive = pageObject.pageRedirectPath == GoRouter.of(context).state.path;
+                      return Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: isActive ? const Color(0xFFFF86C8) : Colors.transparent,
+                              width: 3,
+                            ),
+                          ),
+                          color: 
+                              isActive ? const Color(0xFFF1A1FF).withAlpha(38)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(0),
                         ),
-                      ),
-                      color: 
-                          isActive ? const Color(0xFFF1A1FF).withAlpha(38)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(0),
-                    ),
-                    child: IconButton(
-                      style: ButtonStyle(
-                        fixedSize: WidgetStateProperty.all(const Size(82, 50)),
-                        shape: WidgetStateProperty.all(
-                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+                        child: IconButton(
+                          style: ButtonStyle(
+                            fixedSize: WidgetStateProperty.all(const Size(82, 50)),
+                            shape: WidgetStateProperty.all(
+                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+                            ),
+                          ),
+                          highlightColor: const Color(0xFFFF86C8).withAlpha(41),
+                          icon: Icon(
+                            size: 30,
+                            pageObject.pageIcon,
+                            color: isActive ? const Color(0xFFF1A1FF) : const Color.fromARGB(255, 0, 0, 0),
+                          ),
+                          tooltip: pageObject.iconToolTip,
+                          onPressed: () => context.replaceNamed(pageObject.pageRedirectPath),
                         ),
-                      ),
-                      highlightColor: const Color(0xFFFF86C8).withAlpha(41),
-                      icon: Icon(
-                        size: 30,
-                        pageObject.pageIcon,
-                        color: isActive ? const Color(0xFFF1A1FF) : const Color.fromARGB(255, 0, 0, 0),
-                      ),
-                      tooltip: pageObject.iconToolTip,
-                      onPressed: () => context.replaceNamed(pageObject.pageRedirectPath),
-                    ),
-                  );
-                }).toList(),
-              ),
+                      );
+                    }).toList(),
+                  ),
+                )
             ),
             Container(
               child: const Divider(
@@ -85,4 +98,5 @@ class TopAppBar extends StatelessWidget {
         ),
       ],
     );
+  }
 }
