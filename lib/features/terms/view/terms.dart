@@ -22,17 +22,12 @@ class _TermsScreenState extends State<TermsScreen> {
           ),
           child: Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Terms page!',
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
-                const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                  ],
-                ),
-                
               ],
             ),
           ),

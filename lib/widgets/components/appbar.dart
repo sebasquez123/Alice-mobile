@@ -10,14 +10,10 @@ class TopAppBar extends StatefulWidget {
 }
 
 class _TopAppBarState extends State<TopAppBar> {
-  
-
   @override
   Widget build(BuildContext context){ 
     final routerDelegate = GoRouter.of(context).routerDelegate;
     return Column(
-      children: [
-        Column(
           children: [
             Container(
               constraints: BoxConstraints(
@@ -29,7 +25,7 @@ class _TopAppBarState extends State<TopAppBar> {
               child: const Padding(
                 padding: EdgeInsets.only(left: 0),
                 child: Text(
-                  'HOME PAGE',
+                  'LOCATE LOGO HERE',
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 18,
@@ -40,63 +36,67 @@ class _TopAppBarState extends State<TopAppBar> {
             ),
             Container(
               child: const Divider(
-                color: Color.fromARGB(255, 255, 214, 214),
+                color: Color(0xFFFFD6D6),
                 thickness: 1,
                 height: 1,
               ),
             ),
             AnimatedBuilder(
               animation: routerDelegate,
-              builder: (context, _) => Container(
+              builder: (context, _) {
+                final currentPath = GoRouter.of(context).state.path;
+                final activeIndex = pageObjects.indexWhere((p) => p.pageRedirectPath == currentPath);
+                return Container(
                   color: const Color.fromARGB(255, 255, 255, 255),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: pageObjects.map<Widget>((pageObject) {
-                      final isActive = pageObject.pageRedirectPath == GoRouter.of(context).state.path;
+                    children: List.generate(pageObjects.length, (i) {
+                      final pageObject = pageObjects[i];
+                      final isActive = i == activeIndex;
                       return Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: isActive ? const Color(0xFFFF86C8) : Colors.transparent,
-                              width: 3,
+                        color: isActive ? const Color(0xFFF1A1FF).withAlpha(38) : Colors.transparent,
+                        child: Stack(
+                          alignment: Alignment.bottomCenter,
+                          children: [
+                            IconButton(
+                              style: ButtonStyle(
+                                fixedSize: WidgetStateProperty.all(const Size(82, 50)),
+                                shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
+                                ),
+                              ),
+                              highlightColor: const Color(0xFFFF86C8).withAlpha(41),
+                              icon: Icon(
+                                size: 30,
+                                pageObject.pageIcon,
+                                color: isActive ? const Color(0xFFFF005D) : const Color(0xFF531900),
+                              ),
+                              tooltip: pageObject.iconToolTip,
+                              onPressed: () => context.replaceNamed(pageObject.pageRedirectPath),
                             ),
-                          ),
-                          color: 
-                              isActive ? const Color(0xFFF1A1FF).withAlpha(38)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(0),
-                        ),
-                        child: IconButton(
-                          style: ButtonStyle(
-                            fixedSize: WidgetStateProperty.all(const Size(82, 50)),
-                            shape: WidgetStateProperty.all(
-                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
-                            ),
-                          ),
-                          highlightColor: const Color(0xFFFF86C8).withAlpha(41),
-                          icon: Icon(
-                            size: 30,
-                            pageObject.pageIcon,
-                            color: isActive ? const Color(0xFFF1A1FF) : const Color.fromARGB(255, 0, 0, 0),
-                          ),
-                          tooltip: pageObject.iconToolTip,
-                          onPressed: () => context.replaceNamed(pageObject.pageRedirectPath),
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 350),
+                                curve: Curves.easeInOut,
+                                height: 4,
+                                width: isActive
+                                    ? MediaQuery.of(context).size.width*0.95 / pageObjects.length
+                                    : 0,
+                                decoration: BoxDecoration(
+                                  color: isActive
+                                      ? const Color(0xFFFF005D)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                          ],
                         ),
                       );
-                    }).toList(),
+                    }),
                   ),
-                )
-            ),
-            Container(
-              child: const Divider(
-                color: Color.fromARGB(255, 255, 214, 214),
-                thickness: 1,
-                height: 1,
-              ),
+                );
+              },
             ),
           ],
-        ),
-      ],
-    );
+        );
   }
 }

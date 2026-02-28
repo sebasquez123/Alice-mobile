@@ -22,17 +22,12 @@ class _RegistryScreenState extends State<RegistryScreen> {
           ),
           child: Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Registry page!',
                   style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                  ],
-                ),
-                
+                ),                
               ],
             ),
           ),

@@ -28,13 +28,10 @@ class DaddyScreenState extends State<DaddyScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
           appBar: const PreferredSize(
-            preferredSize: Size.fromHeight(130.0),
+            preferredSize: Size.fromHeight(106.0),
             child: TopAppBar(),
           ),
           key: scaffoldKey,
-          backgroundColor: const Color.fromARGB(255, 255, 97, 250),
-          body: Center(
-            child: widget.child,
-          ),
+          body: widget.child
         );
   }

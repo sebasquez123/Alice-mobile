@@ -22,17 +22,12 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           child: Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Login page!',
                   style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                  ],
-                ),
-                
+                ),                
               ],
             ),
           ),
