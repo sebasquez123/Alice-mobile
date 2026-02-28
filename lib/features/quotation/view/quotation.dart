@@ -22,17 +22,12 @@ class _QuotationScreenState extends State<QuotationScreen> {
           ),
           child: Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Quotation page!',
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
-                const Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                  ],
-                ),
-                
               ],
             ),
           ),
