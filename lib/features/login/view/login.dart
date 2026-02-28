@@ -1,8 +1,7 @@
 import 'package:alice/config.dart';
-import 'package:alice/navigator.dart';
-import 'package:alice/widgets/components/appbar.dart';
+import 'package:alice/features/login/domain/index.dart';
+import 'package:alice/template/index.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 
 final logger = LoggerConfig(instanceName: 'Login');
@@ -17,24 +16,25 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-        builder: (context, constraints) => Center(
-          child: Column(
-            children: [
-              Text(
-                'Login page!',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ElevatedButton(
-                            onPressed: () => context.replaceNamed(Routes.home),
-                            child: const Text('Go home'),
-                          ),
-                ],
-              ),
-              
-            ],
+        builder: (context, constraints) => Container(
+          decoration: BoxDecoration(
+            color: ColorProvider.loginBackground,
+          ),
+          child: Center(
+            child: Column(
+              children: [
+                Text(
+                  'Login page!',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                  ],
+                ),
+                
+              ],
+            ),
           ),
         ),
     );

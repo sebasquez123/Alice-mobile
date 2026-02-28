@@ -1,8 +1,7 @@
 import 'package:alice/config.dart';
-import 'package:alice/navigator.dart';
-import 'package:alice/widgets/components/appbar.dart';
+import 'package:alice/features/terms/domain/index.dart';
+import 'package:alice/template/index.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 
 final logger = LoggerConfig(instanceName: 'Terms');
@@ -17,24 +16,25 @@ class TermsScreen extends StatefulWidget {
 class _TermsScreenState extends State<TermsScreen> {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-        builder: (context, constraints) => Center(
-          child: Column(
-            children: [
-              Text(
-                'Terms page!',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ElevatedButton(
-                            onPressed: () => context.replaceNamed(Routes.home),
-                            child: const Text('Go home'),
-                          ),
-                ],
-              ),
-              
-            ],
+        builder: (context, constraints) => Container(
+          decoration: BoxDecoration(
+            color: ColorProvider.termsBackground,
+          ),
+          child: Center(
+            child: Column(
+              children: [
+                Text(
+                  'Terms page!',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                  ],
+                ),
+                
+              ],
+            ),
           ),
         ),
     );

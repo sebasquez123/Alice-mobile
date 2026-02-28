@@ -1,12 +1,7 @@
 import 'package:alice/config.dart';
-import 'package:alice/features/home/domain/bloc/home.bloc.dart';
-import 'package:alice/features/home/domain/data/home.state.dart';
-import 'package:alice/features/home/domain/events/home.events.dart';
-import 'package:alice/navigator.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
+import 'package:alice/features/home/domain/index.dart';
+import 'package:alice/template/index.dart';
 
 final logger = LoggerConfig(instanceName: 'Home');
 
@@ -39,6 +34,9 @@ class HomeScreenState extends State<HomeScreen> {
           constraints.maxHeight;
           constraints.maxWidth;
           return Container(
+              decoration: BoxDecoration(
+                color: ColorProvider.homeBackground,
+              ),
               child: const Center(
                 child: Text(
                   'Welcome to Alice!',
