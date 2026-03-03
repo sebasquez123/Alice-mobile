@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:alice/config.dart';
-import 'package:alice/daddy.dart';
+import 'package:alice/mayor.dart';
 import 'package:alice/features/home/view/home.dart';
 import 'package:alice/features/login/view/login.dart';
 import 'package:alice/features/quotation/view/quotation.dart';

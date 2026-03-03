@@ -36,25 +36,25 @@ final String urlIcon = '${baseIconsPath}url-icon.svg';
 final String unarchiveIcon = '${baseIconsPath}unarchive-icon.svg';
 
 // local logos
-final String logoArchive = '${baseLogosPath}logo_archive.png';
+final String logoMain = '${baseLogosPath}main.png';
+final String logoWatermark = '${baseLogosPath}watermark.png';
+final String logoTopbar = '${baseLogosPath}topbar.png';
 
 // remote logos
-final String gcsMain = 'main_light.png';
-final String gcsFooter = 'footer_light.png';
-final String gcsMark = 'mark_light.png';
-final String gcsBg = 'bg_light.png';
+final String gMain = 'W1cV4t4S/main.png';
+final String gWatermark = 'DzrfdLSg/watermark.png';
+final String gTopbar = 'zfCDSKyC/topbar.png';
 
-String getNetworkLogo({required String bucketLogo}) => 'AquiLaUrlDelProveedorDeArchivosStaticos%2F$bucketLogo?alt=media';
+String getNetworkLogo(String bucketLogo) => 'https://i.postimg.cc/$bucketLogo';
 
 Future<void> disposeLogoCache() async {
   final List<String> names = [
-    gcsMain,
-    gcsFooter,
-    gcsMark,
-    gcsBg,
+    gMain,
+    gWatermark,
+    gTopbar,
   ];
   for (var name in names) {
-    final url = getNetworkLogo(bucketLogo: name);
+    final url = getNetworkLogo(name);
     await CachedNetworkImage.evictFromCache(url);
   }
 }

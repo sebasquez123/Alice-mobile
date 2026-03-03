@@ -1,4 +1,6 @@
 import 'package:alice/navigator.dart';
+import 'package:alice/template/index.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,16 +24,14 @@ class _TopAppBarState extends State<TopAppBar> {
               color: const Color.fromARGB(255, 255, 255, 255),
               alignment: Alignment.bottomCenter,
               padding: const EdgeInsets.only(left: 16.0, top: 10, bottom: 10),
-              child: const Padding(
-                padding: EdgeInsets.only(left: 0),
-                child: Text(
-                  'LOCATE LOGO HERE',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 0),
+                child: CachedNetworkImage(
+                imageUrl: getNetworkLogo(gTopbar),
+                height: 30,
+                placeholder: (context, url) => SizedBox(child: Center(child: SpinnerProvider.spinnerXs)),
+                errorWidget: (context, url, error) => Image.asset(logoTopbar, height: 30),
+              ),
               ),
             ),
             Container(
