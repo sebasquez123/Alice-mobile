@@ -67,7 +67,9 @@ flutter:
     - .env
     - .env.example
     ## local logos
-    - assets/bussines/logo_archive.png
+    - assets/bussines/main.png
+    - assets/bussines/watermark.png
+    - assets/bussines/topbar.png
     ## icons
     - assets/icons/google-icon.svg
     - assets/icons/apple-icon.svg
@@ -101,10 +103,11 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path_android: "assets/alice_app_icon.png"
   adaptive_icon_foreground: "assets/alice_app_icon.png"
+  adaptive_icon_background: "#FFB4B4"
   min_sdk_android: 21
   remove_alpha_ios: true
+  image_path_android: "assets/alice_app_icon.png"
   image_path_ios: "assets/alice_app_icon.png"
   
 flutter_native_splash:
