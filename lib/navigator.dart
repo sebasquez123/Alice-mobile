@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:alice/appbar.dart';
 import 'package:alice/config.dart';
-import 'package:alice/mayor.dart';
 import 'package:alice/features/home/view/home.dart';
 import 'package:alice/features/login/view/login.dart';
 import 'package:alice/features/quotation/view/quotation.dart';
@@ -140,7 +140,7 @@ class _AppNavigator extends StatelessWidget {
   Widget build(BuildContext context) => PopScope(
         canPop: false,
         onPopInvokedWithResult: (didpop, result) async => leaveAppFromNative(context, didpop),
-        child: DaddyScreen(child: child),
+        child: AppBarScreen(child: child),
       );
 }
 
