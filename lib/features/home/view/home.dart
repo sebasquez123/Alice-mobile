@@ -1,7 +1,7 @@
 import 'package:alice/config.dart';
-import 'package:flutter/material.dart';
 import 'package:alice/features/home/domain/index.dart';
 import 'package:alice/template/index.dart';
+import 'package:flutter/material.dart';
 
 final logger = LoggerConfig(instanceName: 'Home');
 
@@ -20,6 +20,12 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    requestAdds();
+  }
+
+  Future<void> requestAdds() async {
+    print('Requesting adds...');
+    context.read<AddsBloc>().add(LoadAdds());
   }
 
   @override
@@ -37,16 +43,27 @@ class HomeScreenState extends State<HomeScreen> {
               decoration: BoxDecoration(
                 color: ColorProvider.homeBackground,
               ),
-              child: const Center(
-                child: Text(
-                  'Welcome to Alice!',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+
+              child: BlocConsumer<AddsBloc, AddsState>(
+                listener: (context, state) {},
+                builder: (context, state) => Stack(
+                    children: [
+                        SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              ...state.adds.map<Widget>((add) => Column(
+                                  children: [
+                                    Text(add.title),
+                                  const Divider(),
+                                ],
+                              )),
+                          ],
+                        ),
+                      ),
+                      if(state.isLoading) Center( child: SpinnerProvider.spinnerLg)
+                    ]
                   ),
                 ),
-              ),
             );
         }
       );

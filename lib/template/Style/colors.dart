@@ -26,7 +26,7 @@ class ColorProvider {
   static Color get quotationBackground => const Color(0xFFF679AB);
   static Color get registryBackground => const Color(0xFFF679AB);
   static Color get termsBackground =>const Color(0xFFF679AB);
-  static Color get loadingSpinner => const Color(0xFFEF53DD);
+  static Color get loadingSpinner => const Color.fromARGB(255, 255, 255, 255);
   static Color get loadingThreeBounce => const Color(0xFFEF53DD);
 
 

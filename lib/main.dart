@@ -9,7 +9,7 @@ void main() {
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => FactionBloc()),
+        BlocProvider(create: (_) => AddsBloc()),
       ],
       child: const AliceApp(),
     ),

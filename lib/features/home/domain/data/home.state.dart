@@ -1,10 +1,23 @@
+import 'package:alice/models/adds/adds.dart';
 import 'package:equatable/equatable.dart';
 
-class FactionState extends Equatable {
-  final String faction;
-  final int count;
-  const FactionState(this.faction, this.count);
+class AddsState extends Equatable {
+  final List<Adds> adds;
+  final bool isLoading;
+
+  const AddsState({
+    this.adds = const [],
+    this.isLoading = false,
+  });
+
+  AddsState copyWith({
+    List<Adds>? adds,
+    bool? isLoading,
+  }) => AddsState(
+      adds: adds ?? this.adds,
+      isLoading: isLoading ?? this.isLoading,
+    );
 
   @override
-  List<Object?> get props => [faction, count];
+  List<Object?> get props => [adds, isLoading];
 }

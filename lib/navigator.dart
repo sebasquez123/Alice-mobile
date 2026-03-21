@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:alice/appbar.dart';
+import 'package:alice/app_bar.dart';
 import 'package:alice/config.dart';
 import 'package:alice/features/home/view/home.dart';
 import 'package:alice/features/login/view/login.dart';
