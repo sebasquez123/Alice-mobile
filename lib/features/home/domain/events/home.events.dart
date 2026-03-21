@@ -1,8 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-abstract class FactionEvent extends Equatable {
+abstract class AddsEvent extends Equatable {
   @override
   List<Object?> get props => [];
 }
-
-class ToggleFaction extends FactionEvent {}
+class LoadAdds extends AddsEvent {}
