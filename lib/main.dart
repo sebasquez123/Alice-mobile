@@ -1,19 +1,11 @@
 import 'package:alice/config.dart';
-import 'package:alice/features/home/domain/bloc/home.bloc.dart';
 import 'package:alice/navigator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+
 
 void main() {
   config();
-  runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => AddsBloc()),
-      ],
-      child: const AliceApp(),
-    ),
-  );
+  runApp(const AliceApp());
 }
 
 class AliceApp extends StatelessWidget {

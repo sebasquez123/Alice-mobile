@@ -13,10 +13,8 @@ class AddsBloc extends Bloc<AddsEvent, AddsState> {
       final logger = LoggerConfig(instanceName: 'Bloc_Adds');
       final List<Adds> result = [];
       emit(state.copyWith(isLoading: true));
-      print('Loading adds...');
       try{
         final rawResponse = await getAddsQuery();
-        print(  'Raw response: $rawResponse');
         for (Map<String, dynamic> add in rawResponse['adds']) {
           try{
             final adds = Adds.fromJson(add);

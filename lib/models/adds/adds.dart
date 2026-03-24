@@ -43,7 +43,7 @@ class Adds {
   List<String> get tags {
     final Set<String> uniqueTags = {};
     for (final tag in _tags) {
-      uniqueTags.add('@${tag.trim()}');
+      uniqueTags.add('#${tag.trim()}');
     }
     return uniqueTags.toList();
   }

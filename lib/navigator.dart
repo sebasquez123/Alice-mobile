@@ -10,6 +10,8 @@ import 'package:alice/features/registry/view/registry.dart';
 import 'package:alice/features/terms/view/terms.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:alice/features/home/domain/bloc/home.bloc.dart';
 
 final logger = LoggerConfig(instanceName: 'Navigator');
 
@@ -75,8 +77,13 @@ final GoRouter router = GoRouter(
       name: Routes.home,
       path: Routes.home,
       pageBuilder: (context, state) => CustomTransitionPage(
-        child: const _AppNavigator(
-          child: HomeScreen(),
+        child: _AppNavigator(
+          child: MultiBlocProvider (
+            providers: [
+              BlocProvider<AddsBloc>(create: (_) => AddsBloc()),
+            ],
+            child: const HomeScreen(),
+          )
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
         FadeTransition(opacity: animation, child: child)
