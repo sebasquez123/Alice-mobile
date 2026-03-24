@@ -21,7 +21,7 @@ final String archiveIcon = '${baseIconsPath}archive-icon.svg';
 final String emailIcon = '${baseIconsPath}email-icon.svg';
 final String globeIcon = '${baseIconsPath}globe-icon.svg';
 final String infoIcon = '${baseIconsPath}info-icon.svg';
-final String helpIcon = '${baseIconsPath}question-icon.svg';
+final String questionIcon = '${baseIconsPath}question-icon.svg';
 final String lockIcon = '${baseIconsPath}privacy-icon.svg';
 final String signOutIcon = '${baseIconsPath}sign-out-icon.svg';
 final String copyTextIcon = '${baseIconsPath}copy-text-icon.svg';
@@ -37,6 +37,12 @@ final String unarchiveIcon = '${baseIconsPath}unarchive-icon.svg';
 final String loveIcon = '${baseIconsPath}love-icon.svg';
 final String saveIcon = '${baseIconsPath}save-icon.svg';
 final String quoteIcon = '${baseIconsPath}quote-icon.svg';
+final String whatsappIcon = '${baseIconsPath}whatsapp-icon.svg';
+final String mapsIcon = '${baseIconsPath}maps-icon.svg';
+final String billIcon = '${baseIconsPath}bill-icon.svg';
+final String shopIcon = '${baseIconsPath}shop-icon.svg';
+final String cakeIcon = '${baseIconsPath}cake-icon.svg';
+final String userIcon = '${baseIconsPath}user-icon.svg';
 
 // local logos
 final String logoMain = '${baseLogosPath}main.png';

@@ -5,14 +5,12 @@ import 'package:alice/features/home/domain/events/home.events.dart';
 import 'package:alice/models/adds/adds.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
-
 class AddsBloc extends Bloc<AddsEvent, AddsState> {
   AddsBloc() : super(const AddsState()) {
     on<LoadAdds>((event, emit) async {
       final logger = LoggerConfig(instanceName: 'Bloc_Adds');
       final List<Adds> result = [];
-      emit(state.copyWith(isLoading: true));
+      emit(state.copyWith(adds: state.adds, isLoading: true));
       try{
         final rawResponse = await getAddsQuery();
         for (Map<String, dynamic> add in rawResponse['adds']) {
