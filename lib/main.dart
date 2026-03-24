@@ -1,11 +1,19 @@
 import 'package:alice/config.dart';
+import 'package:alice/features/home/domain/index.dart';
 import 'package:alice/navigator.dart';
 import 'package:flutter/material.dart';
 
 
 void main() {
   config();
-  runApp(const AliceApp());
+  runApp(
+    MultiBlocProvider (
+        providers: [
+          BlocProvider<AddsBloc>(create: (_) => AddsBloc()),
+        ],
+        child: const AliceApp(),     
+      )
+    );
 }
 
 class AliceApp extends StatelessWidget {

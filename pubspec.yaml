@@ -103,6 +103,12 @@ flutter:
     - assets/icons/love-icon.svg
     - assets/icons/save-icon.svg
     - assets/icons/quote-icon.svg
+    - assets/icons/whatsapp-icon.svg
+    - assets/icons/maps-icon.svg
+    - assets/icons/bill-icon.svg
+    - assets/icons/shop-icon.svg
+    - assets/icons/cake-icon.svg
+    - assets/icons/user-icon.svg
 
 flutter_launcher_icons:
   android: true

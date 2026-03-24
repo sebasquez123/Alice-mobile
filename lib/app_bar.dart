@@ -2,6 +2,7 @@ import 'package:alice/navigator.dart';
 import 'package:alice/template/index.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:super_cupertino_navigation_bar/super_cupertino_navigation_bar.dart';
 
@@ -71,6 +72,10 @@ class AppBarScreenState extends State<AppBarScreen> {
                 enabled: currentRoute.value == Routes.home,
                 placeholderText: 'Search for our newest products',
                 searchController: searchController,
+                cancelButtonText: 'dismiss',
+                cancelTextStyle: const TextStyle(
+                  color: Color(0xFFFF005D),
+                )
               ),
               largeTitle: SuperLargeTitle(
                 enabled: true,
@@ -142,10 +147,13 @@ class AppBarScreenState extends State<AppBarScreen> {
                                       ),
                                     ),
                                     highlightColor: const Color(0xFFFF86C8).withAlpha(41),
-                                    icon: Icon(
-                                      size: 30,
+                                    icon: SvgPicture.asset(
                                       pageObject.pageIcon,
-                                      color: isActive ? const Color(0xFFFF005D) : const Color(0xFF531900),
+                                      width: 30,
+                                      colorFilter: ColorFilter.mode(
+                                        isActive ? const Color(0xFFFF005D) : const Color(0xFF531900),
+                                        BlendMode.srcIn,
+                                      )
                                     ),
                                     tooltip: pageObject.iconToolTip,
                                     onPressed: () {

@@ -1,6 +1,7 @@
 import 'package:alice/config.dart';
 import 'package:alice/features/home/domain/index.dart';
 import 'package:alice/template/index.dart';
+import 'package:alice/widgets/components/footer.dart';
 import 'package:alice/widgets/home/index.dart';
 import 'package:flutter/material.dart';
 
@@ -36,53 +37,67 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-        builder: (context, constraints) {
-          constraints.maxHeight;
-          constraints.maxWidth;
-          return Container(
-              decoration: BoxDecoration(
-                color: ColorProvider.homeBackground,
-              ),
-              child: BlocConsumer<AddsBloc, AddsState>(
-                listener: (context, state) {},
-                builder: (context, state) => Stack(
-                    children: [
-                        SingleChildScrollView(
+    builder: (context, constraints) {
+      constraints.maxHeight;
+      constraints.maxWidth;
+      return Container(
+        decoration: BoxDecoration(
+          color: ColorProvider.homeBackground,
+        ),
+        child: BlocConsumer<AddsBloc, AddsState>(
+          listener: (context, state) {},
+          builder: (context, state) => Stack(
+            children: [
+                Column(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        child: SingleChildScrollView(
                           physics: const BouncingScrollPhysics(),
-                          child: Column(
-                            children: [
-                              ...state.adds.map<Widget>((add) => Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    AddHeadline(add: add),
-                                    AddImagePost(add: add),
-                                    AddOptions(
-                                      likes: add.liked,
-                                      onLove: () { },
-                                      onShare: () { },
-                                      onQuote: () { },
-                                      onSave: () { },
-                                    ),
-                                    AddDescription(
-                                      title: add.title,
-                                      description: add.description,
-                                      tags: add.tags,
-                                    ),
-                                    const Divider(height: 32, color: Color.fromARGB(255, 255, 214, 239), thickness: 2,),
-                                  ],
-                                ),
-                              )),
-                              const SizedBox(height: 40)
-                          ],
+                            child: Column(
+                              children: [
+                                ...state.adds.map<Widget>((add) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      AddHeadline(add: add),
+                                      AddImagePost(add: add),
+                                      AddOptions(
+                                        likes: add.liked,
+                                        onLove: () { },
+                                        onShare: () { },
+                                        onQuote: () { },
+                                        onSave: () { },
+                                      ),
+                                      AddDescription(
+                                        title: add.title,
+                                        description: add.description,
+                                        tags: add.tags,
+                                      ),
+                                      const Divider(height: 32, color: Color.fromARGB(255, 255, 214, 239), thickness: 2,),
+                                    ],
+                                  ),
+                                )),
+                              Footer(
+                                phoneNumberString: '+57 3126567098',
+                                locationString: 'Mz11 Cs12 san fernando cuba, Pereira',
+                                privacyPolicy: () { },
+                                whatsapp: () { },
+                                location: () { },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      if(state.isLoading) Center( child: SpinnerProvider.spinnerLg),
-                    ]
-                  ),
+                    ),
+                  ],
                 ),
-            );
-        }
+              if(state.isLoading) Center( child: SpinnerProvider.spinnerLg),
+            ]
+          ),
+        ),
       );
+    }
+  );
 }

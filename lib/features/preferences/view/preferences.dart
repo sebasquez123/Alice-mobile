@@ -1,33 +1,32 @@
 import 'package:alice/config.dart';
-import 'package:alice/features/registry/domain/index.dart';
 import 'package:alice/template/index.dart';
 import 'package:flutter/material.dart';
 
 
-final logger = LoggerConfig(instanceName: 'Registry');
+final logger = LoggerConfig(instanceName: 'Preferences');
 
-class RegistryScreen extends StatefulWidget {
-  const RegistryScreen({super.key});
+class PreferencesScreen extends StatefulWidget {
+  const PreferencesScreen({super.key});
 
   @override
-  State<RegistryScreen> createState() => _RegistryScreenState();
+  State<PreferencesScreen> createState() => _PreferencesScreenState();
 }
 
-class _RegistryScreenState extends State<RegistryScreen> {
+class _PreferencesScreenState extends State<PreferencesScreen> {
   @override
   Widget build(BuildContext context) => LayoutBuilder(
         builder: (context, constraints) => Container(
           decoration: BoxDecoration(
-            color: ColorProvider.registryBackground,
+            color: ColorProvider.preferencesBackground,
           ),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Registry page!',
+                  'Preferences page!',
                   style: Theme.of(context).textTheme.headlineMedium,
-                ),                
+                ),
               ],
             ),
           ),

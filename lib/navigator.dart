@@ -4,14 +4,13 @@ import 'dart:io';
 import 'package:alice/app_bar.dart';
 import 'package:alice/config.dart';
 import 'package:alice/features/home/view/home.dart';
+import 'package:alice/features/invoice/view/invoice.dart';
 import 'package:alice/features/login/view/login.dart';
+import 'package:alice/features/preferences/view/preferences.dart';
 import 'package:alice/features/quotation/view/quotation.dart';
-import 'package:alice/features/registry/view/registry.dart';
-import 'package:alice/features/terms/view/terms.dart';
+import 'package:alice/template/index.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:alice/features/home/domain/bloc/home.bloc.dart';
 
 final logger = LoggerConfig(instanceName: 'Navigator');
 
@@ -19,13 +18,13 @@ class Routes {
   static const String home = '/home';
   static const String signIn = '/sign-in';
   static const String quotation = '/quotation';
-  static const String terms = '/terms-of-service';
-  static const String quoteRegistry = '/quote-registry';
+  static const String preferences = '/preferences';
+  static const String invoice = '/invoice';
 }
 
 class PageStack {
   final String pageName;
-  final IconData pageIcon;
+  final String pageIcon;
   final String pageRedirectPath;
   final String? iconToolTip;
   PageStack({
@@ -39,31 +38,31 @@ class PageStack {
 final List<PageStack> pageObjects = [
     PageStack(
       pageName: Routes.home.replaceAll('/', ''),
-      pageIcon: Icons.home,
+      pageIcon: cakeIcon,
       pageRedirectPath: Routes.home,
       iconToolTip: 'Go Home',
     ),
     PageStack(
       pageName: Routes.quotation.replaceAll('/', ''),
-      pageIcon: Icons.store,
+      pageIcon: shopIcon,
       pageRedirectPath: Routes.quotation,
       iconToolTip: 'Go Quotation',
     ),
     PageStack(
-      pageName: Routes.terms.replaceAll('/', ''),
-      pageIcon: Icons.shield,
-      pageRedirectPath: Routes.terms,
-      iconToolTip: 'Go Terms of Service',
+      pageName: Routes.preferences.replaceAll('/', ''),
+      pageIcon: loveIcon,
+      pageRedirectPath: Routes.preferences,
+      iconToolTip: 'Go preferences',
     ),
     PageStack(
-      pageName: Routes.quoteRegistry.replaceAll('/', ''),
-      pageIcon: Icons.heart_broken_sharp,
-      pageRedirectPath: Routes.quoteRegistry,
-      iconToolTip: 'Go Quote Registry',
+      pageName: Routes.invoice.replaceAll('/', ''),
+      pageIcon: billIcon,
+      pageRedirectPath: Routes.invoice,
+      iconToolTip: 'Go invoice checkout',
     ),
     PageStack(
       pageName: Routes.signIn.replaceAll('/', ''),
-      pageIcon: Icons.person,
+      pageIcon: userIcon,
       pageRedirectPath: Routes.signIn,
       iconToolTip: 'Go Sign In',
     ),
@@ -77,13 +76,8 @@ final GoRouter router = GoRouter(
       name: Routes.home,
       path: Routes.home,
       pageBuilder: (context, state) => CustomTransitionPage(
-        child: _AppNavigator(
-          child: MultiBlocProvider (
-            providers: [
-              BlocProvider<AddsBloc>(create: (_) => AddsBloc()),
-            ],
-            child: const HomeScreen(),
-          )
+        child: const _AppNavigator(
+          child: HomeScreen(),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
         FadeTransition(opacity: animation, child: child)
@@ -112,22 +106,22 @@ final GoRouter router = GoRouter(
       ),
     ),
     GoRoute(
-      name: Routes.quoteRegistry,
-      path: Routes.quoteRegistry,
+      name: Routes.invoice,
+      path: Routes.invoice,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: const _AppNavigator(
-          child: RegistryScreen(),
+          child: InvoiceScreen(),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
         FadeTransition(opacity: animation, child: child)
       ),
     ),
     GoRoute(
-      name: Routes.terms,
-      path: Routes.terms,
+      name: Routes.preferences,
+      path: Routes.preferences,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: const _AppNavigator(
-          child: TermsScreen(),
+          child: PreferencesScreen(),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
         FadeTransition(opacity: animation, child: child)
@@ -169,13 +163,13 @@ Future<void> leaveAppFromNative(BuildContext context, bool didpop) async {
         context.replaceNamed(Routes.home);
         break;
       
-      case Routes.quoteRegistry:
-        logger.info('Navigating from quote registry screen to home');
+      case Routes.invoice:
+        logger.info('Navigating from invoice checkout screen to home');
         context.replaceNamed(Routes.home);
         break;
 
-      case Routes.terms:
-        logger.info('Navigating from terms screen to home');
+      case Routes.preferences:
+        logger.info('Navigating from preferences screen to home');
         context.replaceNamed(Routes.home);
         break;
 
