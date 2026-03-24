@@ -34,6 +34,9 @@ final String thumbUpIcon = '${baseIconsPath}thumb-up-icon.svg';
 final String flaskIcon = '${baseIconsPath}experiment-icon.svg';
 final String urlIcon = '${baseIconsPath}url-icon.svg';
 final String unarchiveIcon = '${baseIconsPath}unarchive-icon.svg';
+final String loveIcon = '${baseIconsPath}love-icon.svg';
+final String saveIcon = '${baseIconsPath}save-icon.svg';
+final String quoteIcon = '${baseIconsPath}quote-icon.svg';
 
 // local logos
 final String logoMain = '${baseLogosPath}main.png';
