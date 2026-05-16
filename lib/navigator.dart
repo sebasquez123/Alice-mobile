@@ -6,6 +6,7 @@ import 'package:alice/config.dart';
 import 'package:alice/features/home/view/home.dart';
 import 'package:alice/features/invoice/view/invoice.dart';
 import 'package:alice/features/login/view/login.dart';
+import 'package:alice/features/preferences/domain/index.dart';
 import 'package:alice/features/preferences/view/preferences.dart';
 import 'package:alice/features/quotation/view/quotation.dart';
 import 'package:alice/template/index.dart';
@@ -120,11 +121,17 @@ final GoRouter router = GoRouter(
       name: Routes.preferences,
       path: Routes.preferences,
       pageBuilder: (context, state) => CustomTransitionPage(
-        child: const _AppNavigator(
-          child: PreferencesScreen(),
+        child: _AppNavigator(
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider<LikedAddsBloc>(create: (_) => LikedAddsBloc()),
+              BlocProvider<SavedAddsBloc>(create: (_) => SavedAddsBloc()),
+            ],
+            child: const PreferencesScreen(),
+          ),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
-        FadeTransition(opacity: animation, child: child)
+          FadeTransition(opacity: animation, child: child)
       ),
     ),
   ],
@@ -139,10 +146,10 @@ class _AppNavigator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (didpop, result) async => leaveAppFromNative(context, didpop),
-        child: AppBarScreen(child: child),
-      );
+    canPop: false,
+    onPopInvokedWithResult: (didpop, result) async => leaveAppFromNative(context, didpop),
+    child: AppBarScreen(child: child),
+  );
 }
 
 Future<void> leaveAppFromNative(BuildContext context, bool didpop) async {

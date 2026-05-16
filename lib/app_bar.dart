@@ -47,7 +47,7 @@ class AppBarScreenState extends State<AppBarScreen> {
           key: scaffoldKey,
           body: SuperScaffold(
             scrollController: scrollController,
-            stretch: true,
+            stretch: false,
             body: widget.child,
             appBar: SuperAppBar(
               backgroundColor: const Color.fromARGB(255, 255, 255, 255),
@@ -69,7 +69,7 @@ class AppBarScreenState extends State<AppBarScreen> {
                   ),
                 ),
               searchBar: SuperSearchBar(
-                enabled: currentRoute.value == Routes.home,
+                enabled: currentRoute.value == Routes.home || currentRoute.value == Routes.preferences,
                 placeholderText: 'Search for our newest products',
                 searchController: searchController,
                 cancelButtonText: 'dismiss',

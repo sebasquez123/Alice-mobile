@@ -1,0 +1,50 @@
+final Map<String, dynamic> dummyPreferences = {
+  'savedAdds': [
+  {
+    'addId': '54321',
+    'liked': 5,
+    'title': 'Postre de frutas frescas',
+    'description': 'Deliocioso postre de frutas frescas, perfecto para el postre o la merienda.',
+    'tags': ['Postres', 'Frutas', 'Dulces'],
+    'images': ['https://i.imgur.com/cA5JRvc.jpeg', 'https://i.imgur.com/cA5JRvc.jpeg', 'https://i.imgur.com/cA5JRvc.jpeg'],
+    'createdAt': DateTime.now().subtract(const Duration(days: 2)).toIso8601String(),
+    'updatedAt': DateTime.now().subtract(const Duration(days: 1)).toIso8601String(),
+  },
+  {
+    'addId': '11223',
+    'liked': 17,
+    'title': 'Frutas con chocolate',
+    'description': 'Deliocioso postre de frutas con chocolate, perfecto para el postre o la merienda.',
+    'tags': ['Postres', 'Frutas', 'Dulces'],
+    'images': ['https://i.imgur.com/cA5JRvc.jpeg'],
+    'createdAt': DateTime.now().subtract(const Duration(days: 3)).toIso8601String(),
+    'updatedAt': DateTime.now().subtract(const Duration(days: 2)).toIso8601String(),
+  },
+  {
+    'addId': '12345',
+    'liked': 10,
+    'title': 'Rollo de canela',
+    'description': 'Deliocioso rollo de canela recién horneado, perfecto para el desayuno o la merienda.',
+    'tags': ['Rollos', 'Bizcochos', 'Hojaldres', 'Dulces'],
+    'images': ['https://i.imgur.com/cA5JRvc.jpeg', 'https://i.imgur.com/cA5JRvc.jpeg'],
+    'createdAt': DateTime.now().toIso8601String(),
+    'updatedAt': DateTime.now().toIso8601String(),
+  },
+  {
+    'addId': '67890',
+    'liked': 25,
+    'title': 'Fondant cuvierto de chocolate broshette',
+    'description': 'Deliocioso fondant cuvierto de chocolate broshette, perfecto para el postre o la merienda.',
+    'tags': ['Fondants', 'Chocolates', 'Dulces'],
+    'images': ['https://i.imgur.com/cA5JRvc.jpeg','https://i.imgur.com/cA5JRvc.jpeg','https://i.imgur.com/cA5JRvc.jpeg'],
+    'createdAt': DateTime.now().subtract(const Duration(days: 1)).toIso8601String(),
+    'updatedAt': DateTime.now().toIso8601String(),
+  },
+  ],
+  'likedAdds':[
+    '12345',
+    '67890',
+    '11223',
+    '54321'
+  ]
+};

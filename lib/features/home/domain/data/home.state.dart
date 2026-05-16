@@ -3,21 +3,21 @@ import 'package:equatable/equatable.dart';
 
 class AddsState extends Equatable {
   final List<Adds> adds;
-  final bool isLoading;
+  final bool isLoadingAdds;
 
   const AddsState({
     this.adds = const [],
-    this.isLoading = false,
+    this.isLoadingAdds = false,
   });
 
   AddsState copyWith({
     List<Adds>? adds,
-    bool? isLoading,
+    bool? isLoadingAdds,
   }) => AddsState(
       adds: adds ?? this.adds,
-      isLoading: isLoading ?? this.isLoading,
+      isLoadingAdds: isLoadingAdds ?? this.isLoadingAdds,
     );
 
   @override
-  List<Object?> get props => [adds, isLoading];
+  List<Object?> get props => [adds, isLoadingAdds];
 }
