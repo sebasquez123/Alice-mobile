@@ -10,7 +10,7 @@ class AddsBloc extends Bloc<AddsEvent, AddsState> {
     on<LoadAdds>((event, emit) async {
       final logger = LoggerConfig(instanceName: 'Bloc_Adds');
       final List<Adds> result = [];
-      emit(state.copyWith(adds: state.adds, isLoading: true));
+      emit(state.copyWith(adds: state.adds, isLoadingAdds: true));
       try{
         final rawResponse = await getAddsQuery();
         for (Map<String, dynamic> add in rawResponse['adds']) {
@@ -21,10 +21,10 @@ class AddsBloc extends Bloc<AddsEvent, AddsState> {
             logger.error('Failed to load add, skipping...');
           }
         }
-        emit(state.copyWith(adds: result, isLoading: false));
+        emit(state.copyWith(adds: result, isLoadingAdds: false));
       } catch(e){
         logger.error('Failed to request adds: ${e.toString()}');
-        emit(state.copyWith(isLoading: false));
+        emit(state.copyWith(isLoadingAdds: false));
       }
     });
   }

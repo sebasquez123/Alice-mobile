@@ -21,11 +21,11 @@ class ColorProvider {
   static List<Color> get primaryGradient => [Colors.white, Colors.white, Colors.white];
   static List<Color> get growGradient => [const Color.fromRGBO(189, 189, 189, 1), const Color.fromRGBO(107, 107, 107, 1)];
 
-  static Color get homeBackground => const Color.fromARGB(255, 252, 252, 252);
+  static Color get homeBackground => const Color(0xFFFCFCFC);
   static Color get loginBackground => const Color(0xFFF679AB);
   static Color get quotationBackground => const Color(0xFFF679AB);
   static Color get invoiceBackground => const Color(0xFFF679AB);
-  static Color get preferencesBackground =>const Color(0xFFF679AB);
+  static Color get preferencesBackground =>const Color(0xFFFCFCFC);
   static Color get loadingSpinner => const Color.fromARGB(255, 255, 103, 136);
   static Color get loadingThreeBounce => const Color(0xFFEF53DD);
 

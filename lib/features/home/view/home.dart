@@ -93,7 +93,7 @@ class HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-              if(state.isLoading) Center( child: SpinnerProvider.spinnerLg),
+              if(state.isLoadingAdds) Center( child: SpinnerProvider.spinnerLg),
             ]
           ),
         ),
