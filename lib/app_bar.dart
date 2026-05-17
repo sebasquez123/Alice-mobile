@@ -69,7 +69,7 @@ class AppBarScreenState extends State<AppBarScreen> {
                   ),
                 ),
               searchBar: SuperSearchBar(
-                enabled: currentRoute.value == Routes.home || currentRoute.value == Routes.preferences,
+                enabled: currentRoute.value == Routes.home || currentRoute.value == Routes.catalog,
                 placeholderText: 'Search for our newest products',
                 searchController: searchController,
                 cancelButtonText: 'dismiss',

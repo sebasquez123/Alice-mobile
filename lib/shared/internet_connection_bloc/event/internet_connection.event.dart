@@ -1,14 +1,19 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:equatable/equatable.dart';
 
-abstract class CatalogMostrarioEvent extends Equatable {
+abstract class InternetCheckerEvent extends Equatable {
+  const InternetCheckerEvent();
+  
   @override
   List<Object?> get props => [];
 }
-class LoadCatalogMostrario extends CatalogMostrarioEvent {}
 
+class InternetStatusChanged extends InternetCheckerEvent {
+  final List<ConnectivityResult> connectivityResult;
 
-abstract class CatalogProductEvent extends Equatable {
+  const InternetStatusChanged(this.connectivityResult);
+
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [connectivityResult];
 }
-class LoadCatalogProduct extends CatalogProductEvent {}
+

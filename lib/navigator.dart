@@ -19,8 +19,8 @@ class Routes {
   static const String home = '/home';
   static const String signIn = '/sign-in';
   static const String quotation = '/quotation';
-  static const String preferences = '/preferences';
-  static const String invoice = '/invoice';
+  static const String catalog = '/catalog';
+  static const String orders = '/orders';
 }
 
 class PageStack {
@@ -50,16 +50,16 @@ final List<PageStack> pageObjects = [
       iconToolTip: 'Go Quotation',
     ),
     PageStack(
-      pageName: Routes.preferences.replaceAll('/', ''),
-      pageIcon: loveIcon,
-      pageRedirectPath: Routes.preferences,
-      iconToolTip: 'Go preferences',
+      pageName: Routes.catalog.replaceAll('/', ''),
+      pageIcon: bookIcon,
+      pageRedirectPath: Routes.catalog,
+      iconToolTip: 'Go Catalog',
     ),
     PageStack(
-      pageName: Routes.invoice.replaceAll('/', ''),
+      pageName: Routes.orders.replaceAll('/', ''),
       pageIcon: billIcon,
-      pageRedirectPath: Routes.invoice,
-      iconToolTip: 'Go invoice checkout',
+      pageRedirectPath: Routes.orders,
+      iconToolTip: 'Go Orders',
     ),
     PageStack(
       pageName: Routes.signIn.replaceAll('/', ''),
@@ -107,8 +107,8 @@ final GoRouter router = GoRouter(
       ),
     ),
     GoRoute(
-      name: Routes.invoice,
-      path: Routes.invoice,
+      name: Routes.orders,
+      path: Routes.orders,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: const _AppNavigator(
           child: InvoiceScreen(),
@@ -118,14 +118,14 @@ final GoRouter router = GoRouter(
       ),
     ),
     GoRoute(
-      name: Routes.preferences,
-      path: Routes.preferences,
+      name: Routes.catalog,
+      path: Routes.catalog,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: _AppNavigator(
           child: MultiBlocProvider(
             providers: [
-              BlocProvider<LikedAddsBloc>(create: (_) => LikedAddsBloc()),
-              BlocProvider<SavedAddsBloc>(create: (_) => SavedAddsBloc()),
+              BlocProvider<CatalogMostrarioBloc>(create: (_) => CatalogMostrarioBloc()),
+              BlocProvider<CatalogProductBloc>(create: (_) => CatalogProductBloc()),
             ],
             child: const CatalogScreen(),
           ),
@@ -170,13 +170,13 @@ Future<void> leaveAppFromNative(BuildContext context, bool didpop) async {
         context.replaceNamed(Routes.home);
         break;
       
-      case Routes.invoice:
-        logger.info('Navigating from invoice checkout screen to home');
+      case Routes.orders:
+        logger.info('Navigating from orders screen to home');
         context.replaceNamed(Routes.home);
         break;
 
-      case Routes.preferences:
-        logger.info('Navigating from preferences screen to home');
+      case Routes.catalog:
+        logger.info('Navigating from catalog screen to home');
         context.replaceNamed(Routes.home);
         break;
 
