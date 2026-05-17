@@ -1,5 +1,5 @@
 import 'package:alice/config.dart';
-import 'package:alice/features/invoice/domain/index.dart';
+import 'package:alice/features/orders/domain/index.dart';
 import 'package:alice/template/index.dart';
 import 'package:flutter/material.dart';
 

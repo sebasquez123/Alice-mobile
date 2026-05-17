@@ -3,11 +3,11 @@ import 'dart:io';
 
 import 'package:alice/app_bar.dart';
 import 'package:alice/config.dart';
+import 'package:alice/features/catalog/domain/index.dart';
+import 'package:alice/features/catalog/view/catalog.dart';
 import 'package:alice/features/home/view/home.dart';
-import 'package:alice/features/invoice/view/invoice.dart';
 import 'package:alice/features/login/view/login.dart';
-import 'package:alice/features/preferences/domain/index.dart';
-import 'package:alice/features/preferences/view/preferences.dart';
+import 'package:alice/features/orders/view/orders.dart';
 import 'package:alice/features/quotation/view/quotation.dart';
 import 'package:alice/template/index.dart';
 import 'package:flutter/material.dart';
@@ -127,7 +127,7 @@ final GoRouter router = GoRouter(
               BlocProvider<LikedAddsBloc>(create: (_) => LikedAddsBloc()),
               BlocProvider<SavedAddsBloc>(create: (_) => SavedAddsBloc()),
             ],
-            child: const PreferencesScreen(),
+            child: const CatalogScreen(),
           ),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
