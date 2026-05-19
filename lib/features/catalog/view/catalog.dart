@@ -2,6 +2,7 @@ import 'package:alice/config.dart';
 import 'package:alice/features/catalog/domain/index.dart';
 import 'package:alice/shared/internet_connection_bloc/index.dart';
 import 'package:alice/template/index.dart';
+import 'package:alice/widgets/components/footer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -101,16 +102,15 @@ class _CatalogScreenState extends State<CatalogScreen> {
             constraints.maxHeight;
             constraints.maxWidth;
               return Container(
-                color: ColorProvider.preferencesBackground,
+                decoration: BoxDecoration(
+                  color: ColorProvider.preferencesBackground,
+                ),
                 child:
-                BlocConsumer<InternetCheckerBloc, InternetCheckerState>(
-                    listener: (context, state) {},
-                    builder: (context, internetState) => 
-                  BlocConsumer<CatalogMostrarioBloc, CatalogMostrarioState>(
-                    listener: (context, state) {},
+                BlocBuilder<InternetCheckerBloc, InternetCheckerState>(
+                  builder: (context, internetState) => 
+                  BlocBuilder<CatalogMostrarioBloc, CatalogMostrarioState>(
                     builder: (context, mostrariosState) => 
-                      BlocConsumer<CatalogProductBloc, CatalogProductState>(
-                        listener: (context, state) {},
+                      BlocBuilder<CatalogProductBloc, CatalogProductState>(
                         builder: (context, productsState)
                           {
                           final bool isOffProducts =  !isMostrarios && productsState.products.isEmpty && !internetState.thereisinternet && !productsState.isLoadingProducts;
@@ -121,155 +121,183 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             children: [
                               Column(
                                 children: [
-                                  Expanded(
-                                    child: Container(
-                                      child: Column(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
-                                              child: Container(
-                                                height: 60,
-                                                decoration: BoxDecoration(
-                                                  color: const Color(0xFFFDE6F5),
-                                                  borderRadius: BorderRadius.circular(15),
-                                                ),
-                                                  child: Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: GestureDetector(
-                                                          onTap: () async => await loadMostrarios(context),
-                                                          child: AnimatedContainer(
-                                                            duration: const Duration(milliseconds: 0),
-                                                            curve: Curves.easeInOut,
-                                                            decoration: BoxDecoration(
-                                                              color: !isMostrarios ? Colors.white : Colors.transparent,
-                                                              borderRadius: const BorderRadius.only(
-                                                                topLeft: Radius.circular(15),
-                                                                bottomLeft: Radius.circular(15),
-                                                              )
-                                                            ),
-                                                            alignment: Alignment.center,
-                                                            child: Text(
-                                                              'Mostrarios',
-                                                              style: TextStyle(
-                                                                color: !isMostrarios ? Colors.pinkAccent : Colors.black54,
-                                                                fontWeight: FontWeight.bold,
-                                                                fontSize: 16,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+                                        child: Container(
+                                          height: 60,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            borderRadius: BorderRadius.circular(15),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () async => await loadMostrarios(context),
+                                                  child: AnimatedContainer(
+                                                    duration: const Duration(milliseconds: 300),
+                                                    curve: Curves.easeInOut,
+                                                    decoration: BoxDecoration(
+                                                      color: isMostrarios ? Colors.pinkAccent : Colors.transparent,
+                                                      borderRadius: const BorderRadius.only(
+                                                        topLeft: Radius.circular(15),
+                                                        bottomLeft: Radius.circular(15),
                                                       ),
-                                                      Expanded(
-                                                        child: GestureDetector(
-                                                          onTap: () async => await loadMostrarios(context),
-                                                          child: AnimatedContainer(
-                                                            duration: const Duration(milliseconds: 0),
-                                                            curve: Curves.easeInOut,
-                                                            decoration: BoxDecoration(
-                                                              color: isMostrarios ? Colors.white : Colors.transparent,
-                                                              borderRadius: const BorderRadius.only(
-                                                                topRight: Radius.circular(15),
-                                                                bottomRight: Radius.circular(15),
+                                                      boxShadow: isMostrarios
+                                                          ? [
+                                                              BoxShadow(
+                                                                color: Colors.pinkAccent.withOpacity(0.3),
+                                                                blurRadius: 8,
+                                                                offset: const Offset(0, 2),
                                                               )
-                                                            ),
-                                                            alignment: Alignment.center,
-                                                            child: Text(
-                                                              'Productos',
-                                                              style: TextStyle(
-                                                                color: isMostrarios ? Colors.pinkAccent : Colors.black54,
-                                                                fontWeight: FontWeight.bold,
-                                                                fontSize: 16,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
+                                                            ]
+                                                          : [],
+                                                    ),
+                                                    alignment: Alignment.center,
+                                                    child: Text(
+                                                      'Mostrarios',
+                                                      style: TextStyle(
+                                                        color: isMostrarios ? Colors.white : Colors.grey[600],
+                                                        fontWeight: isMostrarios ? FontWeight.bold : FontWeight.w500,
+                                                        fontSize: 16,
+                                                        letterSpacing: isMostrarios ? 0.5 : 0,
                                                       ),
-                                                    ],
+                                                    ),
                                                   ),
                                                 ),
-                                            ),
-                                            Container(
-                                              padding: const EdgeInsets.only(bottom: 60,left: 12, right: 12),
-                                              child: StaggeredGrid.count(
-                                                crossAxisCount: 2,
-                                                mainAxisSpacing: 12,
-                                                crossAxisSpacing: 12,
+                                              ),
+                                              Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () async => await loadProductos(context),
+                                                  child: AnimatedContainer(
+                                                    duration: const Duration(milliseconds: 300),
+                                                    curve: Curves.easeInOut,
+                                                    decoration: BoxDecoration(
+                                                      color: !isMostrarios ? Colors.pinkAccent : Colors.transparent,
+                                                      borderRadius: const BorderRadius.only(
+                                                        topRight: Radius.circular(15),
+                                                        bottomRight: Radius.circular(15),
+                                                      ),
+                                                      boxShadow: !isMostrarios
+                                                          ? [
+                                                              BoxShadow(
+                                                                color: Colors.pinkAccent.withOpacity(0.3),
+                                                                blurRadius: 8,
+                                                                offset: const Offset(0, 2),
+                                                              )
+                                                            ]
+                                                          : [],
+                                                    ),
+                                                    alignment: Alignment.center,
+                                                    child: Text(
+                                                      'Productos',
+                                                      style: TextStyle(
+                                                        color: !isMostrarios ? Colors.white : Colors.grey[600],
+                                                        fontWeight: !isMostrarios ? FontWeight.bold : FontWeight.w500,
+                                                        fontSize: 16,
+                                                        letterSpacing: !isMostrarios ? 0.5 : 0,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: SingleChildScrollView(
+                                          physics: const BouncingScrollPhysics(),
+                                          child: Column(
                                                 children: [
-                                                  if(isMostrariosLoaded)
-                                                  ...mostrariosState.mostrarios.map((item) => Card(
-                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                  Padding(
+                                                    padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 12.0),
+                                                    child: StaggeredGrid.count(
+                                                        crossAxisCount: 2,
+                                                        mainAxisSpacing: 12,
+                                                        crossAxisSpacing: 12,
                                                         children: [
-                                                          ClipRRect(
-                                                            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                                                            child: Image.network(
-                                                              item.images.first,
-                                                              fit: BoxFit.cover,
-                                                              errorBuilder: (_, __, ___) => const Icon(Icons.image, size: 48),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding: const EdgeInsets.all(8.0),
-                                                            child: Text(
-                                                              item.title,
-                                                              style: const TextStyle(fontWeight: FontWeight.bold),
-                                                              maxLines: 1,
-                                                              overflow: TextOverflow.ellipsis,
-                                                            ),
-                                                          ),
+                                                          if(isMostrariosLoaded)
+                                                          ...mostrariosState.mostrarios.map((item) => Card(
+                                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                                              child: Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                                children: [
+                                                                  ClipRRect(
+                                                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                                                    child: Image.network(
+                                                                      item.images.first,
+                                                                      fit: BoxFit.cover,
+                                                                      errorBuilder: (_, __, ___) => const Icon(Icons.image, size: 48),
+                                                                    ),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: const EdgeInsets.all(8.0),
+                                                                    child: Text(
+                                                                      item.title,
+                                                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                      maxLines: 1,
+                                                                      overflow: TextOverflow.ellipsis,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            )),
+                                                          if(isProductsLoaded)
+                                                          ...productsState.products.map((item) => Card(
+                                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                                              child: Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                                children: [
+                                                                  ClipRRect(
+                                                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                                                    child: Image.network(
+                                                                      item.images.first,
+                                                                      fit: BoxFit.cover,
+                                                                      errorBuilder: (_, __, ___) => const Icon(Icons.image, size: 48),
+                                                                    ),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: const EdgeInsets.all(8.0),
+                                                                    child: Text(
+                                                                      item.title,
+                                                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                                                      maxLines: 1,
+                                                                      overflow: TextOverflow.ellipsis,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            )),
                                                         ],
                                                       ),
-                                                    )),
-                                                  if(isProductsLoaded)
-                                                  ...productsState.products.map((item) => Card(
-                                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                        children: [
-                                                          ClipRRect(
-                                                            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                                                            child: Image.network(
-                                                              item.images.first,
-                                                              fit: BoxFit.cover,
-                                                              errorBuilder: (_, __, ___) => const Icon(Icons.image, size: 48),
-                                                            ),
-                                                          ),
-                                                          Padding(
-                                                            padding: const EdgeInsets.all(8.0),
-                                                            child: Text(
-                                                              item.title,
-                                                              style: const TextStyle(fontWeight: FontWeight.bold),
-                                                              maxLines: 1,
-                                                              overflow: TextOverflow.ellipsis,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    )),
+                                                  ),
+                                                  mostrariosState.isLoadingMostrario || productsState.isLoadingProducts ? const SizedBox() : Footer(
+                                                    phoneNumberString: '+57 3126567098',
+                                                    locationString: 'Mz11 Cs12 San Fernando Cuba, Pereira',
+                                                    privacyPolicy: () { },
+                                                    whatsapp: () { },
+                                                    location: () { },
+                                                  ),
                                                 ],
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            if(mostrariosState.isLoadingMostrario || productsState.isLoadingProducts) Center( child: SpinnerProvider.spinnerLg),
-                            if(isOffMostrarios || isOffProducts)
-                              _DisconnectionOverlay(
-                                onRetry: () {
-                                  if (isMostrarios) {
-                                    loadMostrarios(context);
-                                  } else {
-                                    loadProductos(context);
-                                  }
-                                },
-                              ),
-                          ]
-                        );
+                                          ),
+                                      ),
+                                    ],
+                                  ),
+                              if(mostrariosState.isLoadingMostrario || productsState.isLoadingProducts) Center( child: SpinnerProvider.spinnerLg),
+                              if(isOffMostrarios || isOffProducts)
+                                _DisconnectionOverlay(
+                                  onRetry: () {
+                                    if (isMostrarios) {
+                                      loadMostrarios(context);
+                                    } else {
+                                      loadProductos(context);
+                                    }
+                                  },
+                                ),
+                            ]
+                          );
                         }
                       ),
                     ),

@@ -44,56 +44,47 @@ class HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: ColorProvider.homeBackground,
         ),
-        child: BlocConsumer<AddsBloc, AddsState>(
-          listener: (context, state) {},
-          builder: (context, state) => Stack(
+        child: BlocBuilder<AddsBloc, AddsState>(
+          builder: (context, addsState) => Stack(
             children: [
-                Column(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                            child: Column(
-                              children: [
-                                ...state.adds.map<Widget>((add) => Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      AddHeadline(add: add),
-                                      AddImagePost(add: add),
-                                      AddOptions(
-                                        likes: add.liked,
-                                        onLove: () { },
-                                        onShare: () { },
-                                        onQuote: () { },
-                                        onSave: () { },
-                                      ),
-                                      AddDescription(
-                                        title: add.title,
-                                        description: add.description,
-                                        tags: add.tags,
-                                      ),
-                                      const Divider(height: 32, color: Color.fromARGB(255, 255, 214, 239), thickness: 2,),
-                                    ],
-                                  ),
-                                )),
-                              Footer(
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                            ...addsState.adds.map<Widget>((add) => Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    AddHeadline(add: add),
+                                    AddImagePost(add: add),
+                                    AddOptions(
+                                      onShare: () { },
+                                      onQuote: () { },
+                                    ),
+                                    AddDescription(
+                                      title: add.title,
+                                      description: add.description,
+                                      tags: add.tags,
+                                    ),
+                                    const Divider(height: 32, color: Color.fromARGB(255, 255, 214, 239), thickness: 2,),
+                                  ],
+                                ),
+                              )),
+                              addsState.isLoadingAdds ? const SizedBox() : Footer(
                                 phoneNumberString: '+57 3126567098',
-                                locationString: 'Mz11 Cs12 san fernando cuba, Pereira',
+                                locationString: 'Mz11 Cs12 San Fernando Cuba, Pereira',
                                 privacyPolicy: () { },
                                 whatsapp: () { },
                                 location: () { },
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              if(state.isLoadingAdds) Center( child: SpinnerProvider.spinnerLg),
+              if(addsState.isLoadingAdds) Center( child: SpinnerProvider.spinnerLg),
             ]
           ),
         ),
