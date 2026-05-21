@@ -6,7 +6,6 @@ final logger = LoggerConfig(instanceName: 'adds_model').logger;
 
 class Adds {
   String _addId;
-  int _liked;
   String _title;
   String _description;
   List<String> _tags;
@@ -16,7 +15,6 @@ class Adds {
   
   Adds({
     required String addId,
-    required int liked,
     required String title,
     required String description,
     required List<String> tags,
@@ -24,7 +22,6 @@ class Adds {
     required DateTime createdAt,
     required DateTime updatedAt,
   }) : _addId = addId,
-       _liked = liked,
        _title = title,
        _description = description,
        _tags = tags,
@@ -33,7 +30,6 @@ class Adds {
        _updatedAt = updatedAt;
 
   String get addId => _addId;
-  int get liked => _liked;
   String get title => _title;
   String get description => _description;
   List<String> get images => _images;
@@ -60,8 +56,7 @@ class Adds {
         }
     
         final Adds data = Adds(
-          addId: validateTemplate(json['addId'], '', 'addId'),
-          liked: validateTemplate(json['liked'], 0, 'liked'),
+          addId: validateTemplate(json['add_id'], '', 'addId'),
           title: validateTemplate(json['title'], '', 'title'),
           description: validateTemplate(json['description'], '', 'description'),
           tags: List<String>.from(validateTemplate(json['tags'], [], 'tags')),
@@ -72,7 +67,7 @@ class Adds {
         if (missingElements.isNotEmpty) throw Exception(missingElements.join(', '));
         return data;
       } catch (e) {
-        logger.e('[Add] No enough data to load add: [${e.toString()} \n]');
+        logger.e('No enough data to load add: [${e.toString()} \n]');
         rethrow;
       }
     }

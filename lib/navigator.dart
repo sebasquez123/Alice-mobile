@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:alice/app_bar.dart';
 import 'package:alice/config.dart';
+import 'package:alice/core.dart';
+import 'package:alice/features/catalog/domain/index.dart';
+import 'package:alice/features/catalog/view/catalog.dart';
 import 'package:alice/features/home/view/home.dart';
-import 'package:alice/features/invoice/view/invoice.dart';
 import 'package:alice/features/login/view/login.dart';
-import 'package:alice/features/preferences/domain/index.dart';
-import 'package:alice/features/preferences/view/preferences.dart';
+import 'package:alice/features/orders/view/orders.dart';
 import 'package:alice/features/quotation/view/quotation.dart';
 import 'package:alice/template/index.dart';
 import 'package:flutter/material.dart';
@@ -15,12 +15,13 @@ import 'package:go_router/go_router.dart';
 
 final logger = LoggerConfig(instanceName: 'Navigator');
 
+final searchController = TextEditingController();
 class Routes {
   static const String home = '/home';
   static const String signIn = '/sign-in';
   static const String quotation = '/quotation';
-  static const String preferences = '/preferences';
-  static const String invoice = '/invoice';
+  static const String catalog = '/catalog';
+  static const String orders = '/orders';
 }
 
 class PageStack {
@@ -50,16 +51,16 @@ final List<PageStack> pageObjects = [
       iconToolTip: 'Go Quotation',
     ),
     PageStack(
-      pageName: Routes.preferences.replaceAll('/', ''),
-      pageIcon: loveIcon,
-      pageRedirectPath: Routes.preferences,
-      iconToolTip: 'Go preferences',
+      pageName: Routes.catalog.replaceAll('/', ''),
+      pageIcon: bookIcon,
+      pageRedirectPath: Routes.catalog,
+      iconToolTip: 'Go Catalog',
     ),
     PageStack(
-      pageName: Routes.invoice.replaceAll('/', ''),
+      pageName: Routes.orders.replaceAll('/', ''),
       pageIcon: billIcon,
-      pageRedirectPath: Routes.invoice,
-      iconToolTip: 'Go invoice checkout',
+      pageRedirectPath: Routes.orders,
+      iconToolTip: 'Go Orders',
     ),
     PageStack(
       pageName: Routes.signIn.replaceAll('/', ''),
@@ -69,7 +70,6 @@ final List<PageStack> pageObjects = [
     ),
   ];
 
-
 final GoRouter router = GoRouter(
   initialLocation: Routes.home,
   routes: [
@@ -77,8 +77,9 @@ final GoRouter router = GoRouter(
       name: Routes.home,
       path: Routes.home,
       pageBuilder: (context, state) => CustomTransitionPage(
-        child: const _AppNavigator(
-          child: HomeScreen(),
+        child: _AppNavigator(
+          searchController: searchController,
+          child: const HomeScreen(),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
         FadeTransition(opacity: animation, child: child)
@@ -89,6 +90,7 @@ final GoRouter router = GoRouter(
       path: Routes.signIn,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: const _AppNavigator(
+          searchController: null,
           child: LoginScreen(),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
@@ -100,6 +102,7 @@ final GoRouter router = GoRouter(
       path: Routes.quotation,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: const _AppNavigator(
+          searchController: null,
           child: QuotationScreen(),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
@@ -107,10 +110,11 @@ final GoRouter router = GoRouter(
       ),
     ),
     GoRoute(
-      name: Routes.invoice,
-      path: Routes.invoice,
+      name: Routes.orders,
+      path: Routes.orders,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: const _AppNavigator(
+          searchController: null,
           child: InvoiceScreen(),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
@@ -118,16 +122,17 @@ final GoRouter router = GoRouter(
       ),
     ),
     GoRoute(
-      name: Routes.preferences,
-      path: Routes.preferences,
+      name: Routes.catalog,
+      path: Routes.catalog,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: _AppNavigator(
+          searchController: null,
           child: MultiBlocProvider(
             providers: [
-              BlocProvider<LikedAddsBloc>(create: (_) => LikedAddsBloc()),
-              BlocProvider<SavedAddsBloc>(create: (_) => SavedAddsBloc()),
+              BlocProvider<CatalogMostrarioBloc>(create: (_) => CatalogMostrarioBloc()),
+              BlocProvider<CatalogProductBloc>(create: (_) => CatalogProductBloc()),
             ],
-            child: const PreferencesScreen(),
+            child: const CatalogScreen(),
           ),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
@@ -140,15 +145,17 @@ final GoRouter router = GoRouter(
 
 class _AppNavigator extends StatelessWidget {
   final Widget child;
+  final TextEditingController? searchController;
   const _AppNavigator({
     required this.child,
+    required this.searchController,
   });
 
   @override
   Widget build(BuildContext context) => PopScope(
     canPop: false,
     onPopInvokedWithResult: (didpop, result) async => leaveAppFromNative(context, didpop),
-    child: AppBarScreen(child: child),
+    child: CoreScaffold(searchController: searchController, child: child),
   );
 }
 
@@ -170,13 +177,13 @@ Future<void> leaveAppFromNative(BuildContext context, bool didpop) async {
         context.replaceNamed(Routes.home);
         break;
       
-      case Routes.invoice:
-        logger.info('Navigating from invoice checkout screen to home');
+      case Routes.orders:
+        logger.info('Navigating from orders screen to home');
         context.replaceNamed(Routes.home);
         break;
 
-      case Routes.preferences:
-        logger.info('Navigating from preferences screen to home');
+      case Routes.catalog:
+        logger.info('Navigating from catalog screen to home');
         context.replaceNamed(Routes.home);
         break;
 
