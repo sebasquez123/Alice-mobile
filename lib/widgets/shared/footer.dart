@@ -113,7 +113,25 @@ class Footer extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.network(getNetworkLogo(gMain), width: 80, height: 80),
+                        Image.network(
+                          getNetworkLogo(gMain),
+                          width: 80,
+                          height: 80,
+                          loadingBuilder: (context, child, loadingProgress){
+                            if (loadingProgress == null) return child;
+                              return Center(child: SpinnerProvider.spinnerSm);
+                            },
+                          errorBuilder: (context, error, stackTrace) => Container(
+                              color: Colors.grey[300],
+                              child: Center(
+                                child: Image.asset(
+                                  gMain,
+                                  width: 80,
+                                  height: 80,
+                                ),
+                              ),
+                            ),
+                          ),
                         const Text('Celebrating since 2004', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w500, color: Colors.white)),
                       ],
                     ),

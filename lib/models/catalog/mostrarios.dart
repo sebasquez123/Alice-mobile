@@ -9,7 +9,7 @@ class Mostrarios {
   String _title;
   String _description;
   List<String> _images;
-  String _categoria;
+  String _category;
   DateTime _createdAt;
   DateTime _updatedAt;
   
@@ -18,14 +18,14 @@ class Mostrarios {
     required String title,
     required String description,
     required List<String> images,
-    required String categoria,
+    required String category,
     required DateTime createdAt,
     required DateTime updatedAt,
   }) : _mostrarioId = mostrarioId,
        _title = title,
        _description = description,
        _images = images,
-       _categoria = categoria,
+       _category = category,
        _createdAt = createdAt,
        _updatedAt = updatedAt;
 
@@ -33,7 +33,7 @@ class Mostrarios {
   String get title => _title;
   String get description => _description;
   List<String> get images => _images;
-  String get categoria => _categoria;
+  String get category => _category;
   DateTime get createdAt => _createdAt;
   DateTime get updatedAt => _updatedAt;
 
@@ -54,7 +54,7 @@ class Mostrarios {
         title: validateTemplate(json['title'], '', 'title'),
         description: validateTemplate(json['description'], '', 'description'),
         images: List<String>.from(validateTemplate(json['images'], [], 'images')),
-        categoria: validateTemplate(json['categoria'], '', 'categoria'),
+        category: validateTemplate(json['category'], '', 'category'),
         createdAt: DateTime.parse(validateTemplate(json['createdAt'], DateTime.now().toIso8601String(), 'createdAt')),
         updatedAt: DateTime.parse(validateTemplate(json['updatedAt'], DateTime.now().toIso8601String(), 'updatedAt')),
       );

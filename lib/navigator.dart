@@ -126,7 +126,7 @@ final GoRouter router = GoRouter(
       path: Routes.catalog,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: _AppNavigator(
-          searchController: searchController,
+          searchController: null,
           child: MultiBlocProvider(
             providers: [
               BlocProvider<CatalogMostrarioBloc>(create: (_) => CatalogMostrarioBloc()),

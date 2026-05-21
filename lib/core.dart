@@ -1,4 +1,4 @@
-import 'package:alice/widgets/components/appbar.dart';
+import 'package:alice/widgets/shared/appbar.dart';
 import 'package:flutter/material.dart';
 
 class CoreScaffold extends StatefulWidget {
@@ -20,7 +20,7 @@ class CoreScaffoldState extends State<CoreScaffold> {
     appBar: PreferredSize(
       preferredSize: Size(
         MediaQuery.of(context).size.width,
-        MediaQuery.of(context).size.height * 0.192,
+        widget.searchController != null ? MediaQuery.of(context).size.height * 0.192 : MediaQuery.of(context).size.height * 0.13,
       ),
       child: AppBarWidget(searchController: widget.searchController),
     ),

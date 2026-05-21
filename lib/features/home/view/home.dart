@@ -1,7 +1,7 @@
 import 'package:alice/config.dart';
 import 'package:alice/features/home/domain/index.dart';
 import 'package:alice/template/index.dart';
-import 'package:alice/widgets/components/footer.dart';
+import 'package:alice/widgets/shared/footer.dart';
 import 'package:alice/widgets/home/index.dart';
 import 'package:flutter/material.dart';
 
@@ -47,44 +47,48 @@ class HomeScreenState extends State<HomeScreen> {
         child: BlocBuilder<AddsBloc, AddsState>(
           builder: (context, addsState) => Stack(
             children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                            ...addsState.adds.map<Widget>((add) => Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    AddHeadline(add: add),
-                                    AddImagePost(add: add),
-                                    AddOptions(
-                                      onShare: () { },
-                                      onQuote: () { },
-                                    ),
-                                    AddDescription(
-                                      title: add.title,
-                                      description: add.description,
-                                      tags: add.tags,
-                                    ),
-                                    const Divider(height: 32, color: Color.fromARGB(255, 255, 214, 239), thickness: 2,),
-                                  ],
-                                ),
-                              )),
-                              addsState.isLoadingAdds ? const SizedBox() : Footer(
-                                phoneNumberString: '+57 3126567098',
-                                locationString: 'Mz11 Cs12 San Fernando Cuba, Pereira',
-                                privacyPolicy: () { },
-                                whatsapp: () { },
-                                location: () { },
+              Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ...addsState.adds.map<Widget>((add) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  AddHeadline(add: add),
+                                  AddImagePost(add: add),
+                                  AddOptions(
+                                    onShare: () { },
+                                    onQuote: () { },
+                                  ),
+                                  AddDescription(
+                                    title: add.title,
+                                    description: add.description,
+                                    tags: add.tags,
+                                  ),
+                                  const Divider(height: 32, color: Color.fromARGB(255, 255, 214, 239), thickness: 2,),
+                                ],
                               ),
-                      ],
+                            )),
+                          addsState.isLoadingAdds ? const SizedBox() : Footer(
+                            phoneNumberString: '+57 3126567098',
+                            locationString: 'Mz11 Cs12 San Fernando Cuba, Pereira',
+                            privacyPolicy: () { },
+                            whatsapp: () { },
+                            location: () { },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              if(addsState.isLoadingAdds) Center( child: SpinnerProvider.spinnerLg),
+                ],
+              ),
+              if(addsState.isLoadingAdds) Center(child: SpinnerProvider.spinnerLg),
             ]
           ),
         ),

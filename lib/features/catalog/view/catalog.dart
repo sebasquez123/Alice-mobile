@@ -1,66 +1,13 @@
 import 'package:alice/config.dart';
 import 'package:alice/features/catalog/domain/index.dart';
+import 'package:alice/helpers/index.dart';
 import 'package:alice/shared/internet_connection_bloc/index.dart';
 import 'package:alice/template/index.dart';
-import 'package:alice/widgets/components/footer.dart';
+import 'package:alice/widgets/catalog/index.dart';
+import 'package:alice/widgets/shared/index.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-
 
 final logger = LoggerConfig(instanceName: 'Catalog');
-
-// Custom Painter for Watermark
-class _DisconnectionPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint wave = Paint()
-      ..color = Colors.grey.withOpacity(0.08)
-      ..style = PaintingStyle.fill;
-
-    // Draw decorative wave circles
-    for (int i = 0; i < 3; i++) {
-      canvas.drawCircle(
-        Offset(size.width * 0.5, size.height * 0.3),
-        (i + 1) * 80.0,
-        wave,
-      );
-    }
-
-    // Draw WiFi disconnection icon
-    final Paint iconPaint = Paint()
-      ..color = Colors.grey.withOpacity(0.15)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    canvas.drawPath(
-      _getWifiOffPath(Offset(size.width * 0.5, size.height * 0.25), 60),
-      iconPaint,
-    );
-
-    // Draw X through WiFi
-    final Paint xPaint = Paint()
-      ..color = Colors.red.withOpacity(0.2)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
-
-    canvas.drawLine(
-      Offset(size.width * 0.35, size.height * 0.15),
-      Offset(size.width * 0.65, size.height * 0.35),
-      xPaint,
-    );
-  }
-
-  Path _getWifiOffPath(Offset center, double size) {
-    final path = Path();
-    // WiFi icon outline
-    path.moveTo(center.dx - size * 0.4, center.dy + size * 0.3);
-    path.quadraticBezierTo(center.dx, center.dy - size * 0.4, center.dx + size * 0.4, center.dy + size * 0.3);
-    return path;
-  }
-
-  @override
-  bool shouldRepaint(_DisconnectionPainter oldDelegate) => false;
-}
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
@@ -71,28 +18,68 @@ class CatalogScreen extends StatefulWidget {
 
 class _CatalogScreenState extends State<CatalogScreen> {
 
-  bool isMostrarios = false;
+  bool isMostrarios = true;
+  String? selectedCategory;
+  String searchQuery = '';
+  FocusNode searchFocusNode = FocusNode(debugLabel: 'CatalogSearchBarFocus');
+  bool searchBarHasText = false;
+  TextEditingController searchController = TextEditingController();
   ScrollController scrollController = ScrollController();
-  
+  bool get internetOn => context.watch<InternetCheckerBloc>().state.thereisinternet;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadMostrarios(context);
+      _loadProductos(context);
     });
+    searchController.addListener(_onChangeSearch);
   }
 
-  Future<void> loadMostrarios(BuildContext context) async {
+  void _onChangeSearch() => setState(() {
+    searchBarHasText = searchController.text.isNotEmpty;
+    searchQuery = searchController.text.toLowerCase();
+  });
+
+  Future<void> _loadMostrarios(BuildContext context) async {
     if(isMostrarios) return;
-    setState(() => isMostrarios = true);
+    setState(() {isMostrarios = true; selectedCategory = null;});
     context.read<CatalogMostrarioBloc>().add(LoadCatalogMostrario());
   }
 
-  Future<void> loadProductos(BuildContext context) async {
+  Future<void> _loadProductos(BuildContext context) async {
     if(!isMostrarios) return;
-    setState(() => isMostrarios = false);
+    setState(() {isMostrarios = false; selectedCategory = null;});
     context.read<CatalogProductBloc>().add(LoadCatalogProduct());
+  }
+
+  Future<void> _onRetry(BuildContext context) async {
+    if(!isMostrarios) context.read<CatalogProductBloc>().add(LoadCatalogProduct());
+    if(isMostrarios) context.read<CatalogMostrarioBloc>().add(LoadCatalogMostrario());
+  }
+
+  Set<String> _getCategories(bool isMostrarios, Map<String, dynamic> mostrarios, Map<String, dynamic> productos) {
+    if (isMostrarios) {
+      return mostrarios.keys.toSet();
+    } else {
+      return productos.keys.toSet();
+    }
+  }
+
+  Map<String, dynamic> _filterGroupedBySearch(Map<String, dynamic> grouped) {
+    if (searchQuery.isEmpty) return grouped;
+    
+    final filtered = <String, dynamic>{};
+    grouped.forEach((category, items) {
+      final filteredItems = (items as List).where((item) {
+        final name = (item.title ?? '') as String;
+        return name.toLowerCase().contains(searchQuery);
+      }).toList();
+      if (filteredItems.isNotEmpty) {
+        filtered[category] = filteredItems;
+      }
+    });
+    return filtered;
   }
 
   @override
@@ -106,325 +93,129 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   color: ColorProvider.preferencesBackground,
                 ),
                 child:
-                BlocBuilder<InternetCheckerBloc, InternetCheckerState>(
-                  builder: (context, internetState) => 
                   BlocBuilder<CatalogMostrarioBloc, CatalogMostrarioState>(
                     builder: (context, mostrariosState) => 
                       BlocBuilder<CatalogProductBloc, CatalogProductState>(
                         builder: (context, productsState)
                           {
-                          final bool isOffProducts =  !isMostrarios && productsState.products.isEmpty && !internetState.thereisinternet && !productsState.isLoadingProducts;
-                          final bool isOffMostrarios =  isMostrarios && mostrariosState.mostrarios.isEmpty && !internetState.thereisinternet && !mostrariosState.isLoadingMostrario;
+
+                          final bool failedByInternet = !internetOn && (mostrariosState.isErrorMostrario || productsState.isErrorProducts);
                           final bool isMostrariosLoaded = isMostrarios && mostrariosState.mostrarios.isNotEmpty && !mostrariosState.isLoadingMostrario;
                           final bool isProductsLoaded = !isMostrarios && productsState.products.isNotEmpty && !productsState.isLoadingProducts;
+
+                          final groupedMostrarios = _filterGroupedBySearch(groupByCategory(mostrariosState.mostrarios));
+                          final groupedProducts = _filterGroupedBySearch(groupByCategory(productsState.products));
+                          final categories = _getCategories(isMostrarios, groupedMostrarios, groupedProducts).toList();
+
                           return Stack(
                             children: [
                               Column(
                                 children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-                                        child: Container(
-                                          height: 60,
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[200],
-                                            borderRadius: BorderRadius.circular(15),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: GestureDetector(
-                                                  onTap: () async => await loadMostrarios(context),
-                                                  child: AnimatedContainer(
-                                                    duration: const Duration(milliseconds: 300),
-                                                    curve: Curves.easeInOut,
-                                                    decoration: BoxDecoration(
-                                                      color: isMostrarios ? Colors.pinkAccent : Colors.transparent,
-                                                      borderRadius: const BorderRadius.only(
-                                                        topLeft: Radius.circular(15),
-                                                        bottomLeft: Radius.circular(15),
-                                                      ),
-                                                      boxShadow: isMostrarios
-                                                          ? [
-                                                              BoxShadow(
-                                                                color: Colors.pinkAccent.withOpacity(0.3),
-                                                                blurRadius: 8,
-                                                                offset: const Offset(0, 2),
-                                                              )
-                                                            ]
-                                                          : [],
-                                                    ),
-                                                    alignment: Alignment.center,
-                                                    child: Text(
-                                                      'Mostrarios',
-                                                      style: TextStyle(
-                                                        color: isMostrarios ? Colors.white : Colors.grey[600],
-                                                        fontWeight: isMostrarios ? FontWeight.bold : FontWeight.w500,
-                                                        fontSize: 16,
-                                                        letterSpacing: isMostrarios ? 0.5 : 0,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: GestureDetector(
-                                                  onTap: () async => await loadProductos(context),
-                                                  child: AnimatedContainer(
-                                                    duration: const Duration(milliseconds: 300),
-                                                    curve: Curves.easeInOut,
-                                                    decoration: BoxDecoration(
-                                                      color: !isMostrarios ? Colors.pinkAccent : Colors.transparent,
-                                                      borderRadius: const BorderRadius.only(
-                                                        topRight: Radius.circular(15),
-                                                        bottomRight: Radius.circular(15),
-                                                      ),
-                                                      boxShadow: !isMostrarios
-                                                          ? [
-                                                              BoxShadow(
-                                                                color: Colors.pinkAccent.withOpacity(0.3),
-                                                                blurRadius: 8,
-                                                                offset: const Offset(0, 2),
-                                                              )
-                                                            ]
-                                                          : [],
-                                                    ),
-                                                    alignment: Alignment.center,
-                                                    child: Text(
-                                                      'Productos',
-                                                      style: TextStyle(
-                                                        color: !isMostrarios ? Colors.white : Colors.grey[600],
-                                                        fontWeight: !isMostrarios ? FontWeight.bold : FontWeight.w500,
-                                                        fontSize: 16,
-                                                        letterSpacing: !isMostrarios ? 0.5 : 0,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: SingleChildScrollView(
-                                          physics: const BouncingScrollPhysics(),
-                                          child: Column(
-                                                children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 12.0),
-                                                    child: StaggeredGrid.count(
-                                                        crossAxisCount: 2,
-                                                        mainAxisSpacing: 12,
-                                                        crossAxisSpacing: 12,
-                                                        children: [
-                                                          if(isMostrariosLoaded)
-                                                          ...mostrariosState.mostrarios.map((item) => Card(
-                                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                                              child: Column(
-                                                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                                children: [
-                                                                  ClipRRect(
-                                                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                                                                    child: Image.network(
-                                                                      item.images.first,
-                                                                      fit: BoxFit.cover,
-                                                                      errorBuilder: (_, __, ___) => const Icon(Icons.image, size: 48),
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding: const EdgeInsets.all(8.0),
-                                                                    child: Text(
-                                                                      item.title,
-                                                                      style: const TextStyle(fontWeight: FontWeight.bold),
-                                                                      maxLines: 1,
-                                                                      overflow: TextOverflow.ellipsis,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            )),
-                                                          if(isProductsLoaded)
-                                                          ...productsState.products.map((item) => Card(
-                                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                                              child: Column(
-                                                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                                children: [
-                                                                  ClipRRect(
-                                                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                                                                    child: Image.network(
-                                                                      item.images.first,
-                                                                      fit: BoxFit.cover,
-                                                                      errorBuilder: (_, __, ___) => const Icon(Icons.image, size: 48),
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding: const EdgeInsets.all(8.0),
-                                                                    child: Text(
-                                                                      item.title,
-                                                                      style: const TextStyle(fontWeight: FontWeight.bold),
-                                                                      maxLines: 1,
-                                                                      overflow: TextOverflow.ellipsis,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            )),
-                                                        ],
-                                                      ),
-                                                  ),
-                                                  mostrariosState.isLoadingMostrario || productsState.isLoadingProducts ? const SizedBox() : Footer(
-                                                    phoneNumberString: '+57 3126567098',
-                                                    locationString: 'Mz11 Cs12 San Fernando Cuba, Pereira',
-                                                    privacyPolicy: () { },
-                                                    whatsapp: () { },
-                                                    location: () { },
-                                                  ),
-                                                ],
-                                              ),
-                                          ),
-                                      ),
-                                    ],
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 5, left: 12.0, right: 12.0, bottom: 8),
+                                    child: AnimatedSwitch(
+                                      isActive: isMostrarios,
+                                      onFirstTabTap: _loadMostrarios,
+                                      onSecondTabTap: _loadProductos,
+                                      firstLabel: 'Mostrarios',
+                                      secondLabel: 'Productos',
+                                    ),
                                   ),
-                              if(mostrariosState.isLoadingMostrario || productsState.isLoadingProducts) Center( child: SpinnerProvider.spinnerLg),
-                              if(isOffMostrarios || isOffProducts)
-                                _DisconnectionOverlay(
-                                  onRetry: () {
-                                    if (isMostrarios) {
-                                      loadMostrarios(context);
-                                    } else {
-                                      loadProductos(context);
-                                    }
-                                  },
-                                ),
+                                  SearchField(
+                                    searchController: searchController, 
+                                    searchFocusNode: searchFocusNode, 
+                                    hasText: searchBarHasText, 
+                                    onClear: () => searchController.clear()
+                                  ),
+                                  if(categories.isNotEmpty && isMostrarios)...[
+                                  SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                      child: Row(
+                                        children: [       
+                                          GestureDetector(
+                                            onTap: () => setState(() => selectedCategory = null),
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                              decoration: BoxDecoration(
+                                                color: selectedCategory == null ? const Color(0xFF531900) : Colors.grey[300],
+                                                borderRadius: BorderRadius.circular(20),
+                                              ),
+                                              child: Text(
+                                                'Todos',
+                                                style: TextStyle(
+                                                  color: selectedCategory == null ? Colors.white : Colors.grey[600],
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 3),
+                                          ...categories.map((category) => GestureDetector(
+                                            onTap: () => setState(() => selectedCategory = category),
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 3),
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                                decoration: BoxDecoration(
+                                                  color: selectedCategory == category ? const Color(0xFF531900) : Colors.grey[300],
+                                                  borderRadius: BorderRadius.circular(20),
+                                                ),
+                                                child: Text(
+                                                  category,
+                                                  style: TextStyle(
+                                                    color: selectedCategory == category ? Colors.white : Colors.grey[600],
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          )),
+                                        ],
+                                      ),
+                                    ),],
+                                  Expanded(
+                                    child: SingleChildScrollView(
+                                      physics: const BouncingScrollPhysics(),
+                                      child: Column(
+                                        children: [
+                                          if(isMostrariosLoaded)
+                                            ...buildGroupedMostrariosList(
+                                              groupedMostrarios: selectedCategory == null
+                                                  ? groupedMostrarios
+                                                  : {selectedCategory!: groupedMostrarios[selectedCategory!] ?? []},
+                                            ),
+                                          if(isProductsLoaded)
+                                            ...buildGroupedProductList(
+                                              groupedProducts: groupedProducts
+                                            ),
+                                          if(failedByInternet && !productsState.isLoadingProducts && !mostrariosState.isLoadingMostrario)
+                                            ConnectionRetryWidget(onRetry: _onRetry),
+                                          if(!failedByInternet)
+                                            if(!productsState.isLoadingProducts && !mostrariosState.isLoadingMostrario)
+                                              Footer(
+                                                phoneNumberString: '+57 3126567098',
+                                                locationString: 'Mz11 Cs12 San Fernando Cuba, Pereira',
+                                                privacyPolicy: () { },
+                                                whatsapp: () { },
+                                                location: () { },
+                                              ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if(mostrariosState.isLoadingMostrario || productsState.isLoadingProducts) Center(child: SpinnerProvider.spinnerLg),
                             ]
                           );
                         }
                       ),
                     ),
-                ),
           );
         }
       );
-}
-
-class _DisconnectionOverlay extends StatefulWidget {
-  final VoidCallback onRetry;
-
-  const _DisconnectionOverlay({required this.onRetry});
-
-  @override
-  State<_DisconnectionOverlay> createState() => _DisconnectionOverlayState();
-}
-
-class _DisconnectionOverlayState extends State<_DisconnectionOverlay>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
-
-    _animationController.forward();
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => FadeTransition(
-      opacity: _fadeAnimation,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.95),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        margin: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: CustomPaint(
-                painter: _DisconnectionPainter(),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ScaleTransition(
-                        scale: Tween<double>(begin: 0.8, end: 1.0).animate(
-                          CurvedAnimation(parent: _animationController, curve: Curves.elasticInOut),
-                        ),
-                        child: Icon(
-                          Icons.wifi_off_rounded,
-                          size: 80,
-                          color: Colors.red.withOpacity(0.6),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'Ups, sin conexión',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Text(
-                          'Parece que no hay conexión a internet. Verifica tu conexión e intenta de nuevo.',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                            height: 1.4,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: AnimatedBuilder(
-                animation: _animationController,
-                builder: (context, child) => Transform.scale(
-                    scale: 0.95 + (_animationController.value * 0.05),
-                    child: ElevatedButton.icon(
-                      onPressed: widget.onRetry,
-                      icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('Reintentar'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pinkAccent,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 40,
-                          vertical: 14,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 4,
-                      ),
-                    ),
-                  ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-}

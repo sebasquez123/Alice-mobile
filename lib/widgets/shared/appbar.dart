@@ -1,5 +1,6 @@
 import 'package:alice/navigator.dart';
 import 'package:alice/template/index.dart';
+import 'package:alice/widgets/shared/index.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -23,16 +24,14 @@ class AppBarState extends State<AppBarWidget> {
   void initState() {
     super.initState();
     _router = GoRouter.of(context).routerDelegate;
-    _router.addListener(_onRouteChanged);
     widget.searchController?.addListener(_onChangeSearch);
   }
 
-  void _onRouteChanged() => setState(() {});
   void _onChangeSearch() => setState(() => searchBarHasText = widget.searchController?.text.isNotEmpty ?? false);
 
   @override
   void dispose() {
-    _router.removeListener(_onRouteChanged);
+
     widget.searchController?.removeListener(_onChangeSearch);
     searchFocusNode.dispose();
     super.dispose();
@@ -77,81 +76,12 @@ class AppBarState extends State<AppBarWidget> {
               ),
             ),
           ),
-          widget.searchController != null ? Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: searchFocusNode.hasFocus
-                    ? [
-                        BoxShadow(
-                          color: const Color(0xFFFF005D).withAlpha(25),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        )
-                      ]
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withAlpha(10),
-                          blurRadius: 4,
-                          offset: const Offset(0, 1),
-                        )
-                      ],
-              ),
-              child: TextField(
-                focusNode: searchFocusNode,
-                style: const TextStyle(
-                  color: Color(0xFF531900),
-                  fontSize: 15,
-                ),
-                controller: widget.searchController,
-                decoration: InputDecoration(
-                  hintStyle: TextStyle(
-                    color: const Color(0xFF531900).withAlpha(128),
-                    fontWeight: FontWeight.w400,
-                    fontSize: 15,
-                  ),
-                  hintText: 'Search',
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: searchFocusNode.hasFocus
-                        ? const Color(0xFFFF005D)
-                        : const Color(0xFF531900).withAlpha(153),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  filled: true,
-                  fillColor: searchFocusNode.hasFocus
-                      ? const Color(0xFFF1A1FF).withAlpha(35)
-                      : const Color(0xFFF1A1FF).withAlpha(15),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(
-                      color: const Color(0xFF531900).withAlpha(25),
-                      width: 1,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: const BorderSide(
-                      color: Color(0xFFFF005D),
-                      width: 1.5,
-                    ),
-                  ),
-                  suffixIcon: searchFocusNode.hasFocus && searchBarHasText
-                      ? GestureDetector(
-                          onTap: () => widget.searchController?.clear(),
-                          child: Icon(
-                            Icons.close,
-                            color: const Color(0xFFFF005D).withAlpha(179),
-                            size: 24,
-                          ),
-                        )
-                      : null,
-                  isDense: true,
-                ),
-              ),
-            ),
+          widget.searchController != null ? 
+          SearchField(
+            searchController: widget.searchController, 
+            searchFocusNode: searchFocusNode, 
+            hasText: searchBarHasText, 
+            onClear: () => widget.searchController?.clear()
           ) : const SizedBox(),
           AnimatedBuilder(
             animation: _router,
