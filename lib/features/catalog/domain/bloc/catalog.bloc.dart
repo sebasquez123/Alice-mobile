@@ -23,7 +23,7 @@ class CatalogMostrarioBloc extends Bloc<CatalogMostrarioEvent, CatalogMostrarioS
             logger.error('Failed to load mostrario, skipping...');
           }
         }
-        emit(state.copyWith(isLoadingMostrario: false, mostrarios: result, isErrorMostrario: true));
+        emit(state.copyWith(isLoadingMostrario: false, mostrarios: result, isErrorMostrario: false));
       } catch(e){
         logger.error('Failed to request Mostrarios: ${e.toString()}');
         emit(state.copyWith(isLoadingMostrario: false, mostrarios: const [], isErrorMostrario: true));
@@ -48,7 +48,7 @@ class CatalogProductBloc extends Bloc<CatalogProductEvent, CatalogProductState> 
             logger.error('Failed to load product, skipping...');
           }
         }
-        emit(state.copyWith(isLoadingProducts: false, products: result, isErrorProducts: true));
+        emit(state.copyWith(isLoadingProducts: false, products: result, isErrorProducts: false));
       } catch(e){
         logger.error('Failed to request products: ${e.toString()}');
         emit(state.copyWith(isLoadingProducts: false, products: const [], isErrorProducts: true));

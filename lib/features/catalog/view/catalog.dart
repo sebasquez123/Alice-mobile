@@ -18,6 +18,9 @@ class CatalogScreen extends StatefulWidget {
 
 class _CatalogScreenState extends State<CatalogScreen> {
 
+  String lackInternetConnectionStatus = 'Comprueba tu conexión';
+  String genericErrorStatus = 'Ups, algo salió mal. Por favor, intenta mas ratito.';
+
   bool isMostrarios = true;
   String? selectedCategory;
   String searchQuery = '';
@@ -58,12 +61,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
     if(isMostrarios) context.read<CatalogMostrarioBloc>().add(LoadCatalogMostrario());
   }
 
-  Set<String> _getCategories(bool isMostrarios, Map<String, dynamic> mostrarios, Map<String, dynamic> productos) {
-    if (isMostrarios) {
-      return mostrarios.keys.toSet();
-    } else {
-      return productos.keys.toSet();
-    }
+  Set<String> _getCategories(bool isMostrarios, Map<String, dynamic> mostrarios) {
+    if (isMostrarios) return mostrarios.keys.toSet();
+    return {};
   }
 
   Map<String, dynamic> _filterGroupedBySearch(Map<String, dynamic> grouped) {
@@ -99,13 +99,16 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         builder: (context, productsState)
                           {
 
-                          final bool failedByInternet = !internetOn && (mostrariosState.isErrorMostrario || productsState.isErrorProducts);
+                          final bool failedRequest = (mostrariosState.isErrorMostrario || productsState.isErrorProducts);
                           final bool isMostrariosLoaded = isMostrarios && mostrariosState.mostrarios.isNotEmpty && !mostrariosState.isLoadingMostrario;
                           final bool isProductsLoaded = !isMostrarios && productsState.products.isNotEmpty && !productsState.isLoadingProducts;
 
-                          final groupedMostrarios = _filterGroupedBySearch(groupByCategory(mostrariosState.mostrarios));
+                          final groupedMostrarios = groupByCategory(mostrariosState.mostrarios);
                           final groupedProducts = _filterGroupedBySearch(groupByCategory(productsState.products));
-                          final categories = _getCategories(isMostrarios, groupedMostrarios, groupedProducts).toList();
+                          final categories = _getCategories(isMostrarios, groupedMostrarios).toList();
+
+                          final bool searchIsNotFound = groupedProducts.isEmpty && isProductsLoaded && !failedRequest && searchQuery.isNotEmpty;
+                          final bool needRetry = failedRequest && !productsState.isLoadingProducts && !mostrariosState.isLoadingMostrario;
 
                           return Stack(
                             children: [
@@ -121,88 +124,62 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                       secondLabel: 'Productos',
                                     ),
                                   ),
+                                  if(isProductsLoaded)
                                   SearchField(
                                     searchController: searchController, 
                                     searchFocusNode: searchFocusNode, 
                                     hasText: searchBarHasText, 
                                     onClear: () => searchController.clear()
                                   ),
-                                  if(categories.isNotEmpty && isMostrarios)...[
-                                  SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                                      child: Row(
-                                        children: [       
-                                          GestureDetector(
-                                            onTap: () => setState(() => selectedCategory = null),
-                                            child: Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                              decoration: BoxDecoration(
-                                                color: selectedCategory == null ? const Color(0xFF531900) : Colors.grey[300],
-                                                borderRadius: BorderRadius.circular(20),
-                                              ),
-                                              child: Text(
-                                                'Todos',
-                                                style: TextStyle(
-                                                  color: selectedCategory == null ? Colors.white : Colors.grey[600],
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 3),
-                                          ...categories.map((category) => GestureDetector(
-                                            onTap: () => setState(() => selectedCategory = category),
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 3),
-                                              child: Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                                                decoration: BoxDecoration(
-                                                  color: selectedCategory == category ? const Color(0xFF531900) : Colors.grey[300],
-                                                  borderRadius: BorderRadius.circular(20),
-                                                ),
-                                                child: Text(
-                                                  category,
-                                                  style: TextStyle(
-                                                    color: selectedCategory == category ? Colors.white : Colors.grey[600],
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          )),
-                                        ],
-                                      ),
-                                    ),],
+                                  if(categories.isNotEmpty && isMostrarios)
+                                  CategoryLabelingWidget(
+                                    categories: categories,
+                                    selectedCategory: selectedCategory,
+                                    onCategorySelected: (category) => setState(() => selectedCategory = category),
+                                  ),
                                   Expanded(
                                     child: SingleChildScrollView(
                                       physics: const BouncingScrollPhysics(),
-                                      child: Column(
-                                        children: [
-                                          if(isMostrariosLoaded)
-                                            ...buildGroupedMostrariosList(
-                                              groupedMostrarios: selectedCategory == null
-                                                  ? groupedMostrarios
-                                                  : {selectedCategory!: groupedMostrarios[selectedCategory!] ?? []},
-                                            ),
-                                          if(isProductsLoaded)
-                                            ...buildGroupedProductList(
-                                              groupedProducts: groupedProducts
-                                            ),
-                                          if(failedByInternet && !productsState.isLoadingProducts && !mostrariosState.isLoadingMostrario)
-                                            ConnectionRetryWidget(onRetry: _onRetry),
-                                          if(!failedByInternet)
-                                            if(!productsState.isLoadingProducts && !mostrariosState.isLoadingMostrario)
-                                              Footer(
-                                                phoneNumberString: '+57 3126567098',
-                                                locationString: 'Mz11 Cs12 San Fernando Cuba, Pereira',
-                                                privacyPolicy: () { },
-                                                whatsapp: () { },
-                                                location: () { },
-                                              ),
-                                        ],
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(bottom: 50),
+                                        child: GestureDetector(
+                                          onHorizontalDragEnd: (details) {
+                                            if (details.primaryVelocity! > 1) {
+                                              if (isMostrarios) return;
+                                              _loadMostrarios(context);
+                                            } else if (details.primaryVelocity! < -1) {
+                                              if (!isMostrarios) return;
+                                              _loadProductos(context);
+                                            }
+                                          },
+                                          child: Column(
+                                            children: [
+                                              if(isMostrariosLoaded)
+                                                 ...buildGroupedMostrariosList(
+                                                  groupedMostrarios: selectedCategory == null
+                                                      ? groupedMostrarios
+                                                      : {selectedCategory!: groupedMostrarios[selectedCategory!] ?? []},
+                                                ),
+                                              if(isProductsLoaded)
+                                                ...buildGroupedProductList(
+                                                  groupedProducts: selectedCategory == null
+                                                      ? groupedProducts
+                                                      : {selectedCategory!: groupedProducts[selectedCategory!] ?? []},
+                                                ),
+                                              if(needRetry)
+                                                ConnectionRetryWidget(
+                                                  onRetry: _onRetry,
+                                                  message: !internetOn ? lackInternetConnectionStatus : genericErrorStatus,
+                                                ),
+                                              if(searchIsNotFound)
+                                                NotFoundWidget(
+                                                  itemName: searchQuery,
+                                                  icon: Icons.search_off_rounded,
+                                                  boxSize: MediaQuery.sizeOf(context).height*0.55,
+                                                ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),

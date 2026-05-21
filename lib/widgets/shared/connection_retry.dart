@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 class ConnectionRetryWidget extends StatelessWidget {
   final Future<void> Function(BuildContext) onRetry;
+  final String message;
 
   const ConnectionRetryWidget({
     super.key,
     required this.onRetry,
+    this.message = 'Ups, algo salió mal. Por favor, intenta de nuevo.',
   });
 
   @override
@@ -21,7 +23,7 @@ class ConnectionRetryWidget extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              'No hay conexión a internet',
+              message,
               style: TextStyle(
                 fontSize: 18,
                 color: Colors.grey.withAlpha(150),
