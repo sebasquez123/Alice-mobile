@@ -1,5 +1,6 @@
 import 'package:alice/navigator.dart';
 import 'package:alice/template/index.dart';
+import 'package:alice/widgets/home/create_post.dart';
 import 'package:alice/widgets/shared/index.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ class AppBarWidget extends StatefulWidget {
 }
 
 class AppBarState extends State<AppBarWidget> {
+
   final FocusNode searchFocusNode = FocusNode(debugLabel: 'SearchBarFocus');
   
   late final GoRouterDelegate _router;
@@ -59,7 +61,17 @@ class AppBarState extends State<AppBarWidget> {
                   Row(
                     children: [
                       IconButton(
-                        onPressed: () { },
+                        onPressed: () {
+                          showCreatePostSheet(
+                            context,
+                            onPost: (data) {
+                              
+                            },
+                            onSave: (data) {
+
+                            }
+                          );
+                        },
                         iconSize: 28,
                         color: const Color(0xFF531900),
                         icon: const Icon(Icons.image),

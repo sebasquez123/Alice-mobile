@@ -12,6 +12,7 @@ class MostrarioCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Card(
+      color: const Color.fromARGB(255, 255, 255, 255),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 2,
       child: Column(

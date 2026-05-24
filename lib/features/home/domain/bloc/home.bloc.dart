@@ -1,30 +1,30 @@
-import 'package:alice/api/get_adds.dart';
+import 'package:alice/api/get_ads.dart';
 import 'package:alice/config.dart';
 import 'package:alice/features/home/domain/data/home.state.dart';
 import 'package:alice/features/home/domain/events/home.events.dart';
-import 'package:alice/models/adds/adds.dart';
+import 'package:alice/models/ads/ads.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AddsBloc extends Bloc<AddsEvent, AddsState> {
-  AddsBloc() : super(const AddsState()) {
-    on<LoadAdds>((event, emit) async {
-      final logger = LoggerConfig(instanceName: 'Bloc_Adds');
-      final List<Adds> result = [];
-      emit(state.copyWith(adds: state.adds, isLoadingAdds: true));
+class AdsBloc extends Bloc<AdsEvent, AdsState> {
+  AdsBloc() : super(const AdsState()) {
+    on<LoadAds>((event, emit) async {
+      final logger = LoggerConfig(instanceName: 'Bloc_Ads');
+      final List<Ads> result = [];
+      emit(state.copyWith(ads: state.ads, isLoadingAds: true));
       try{
-        final rawResponse = await getAddsQuery();
-        for (Map<String, dynamic> add in rawResponse['adds']) {
+        final rawResponse = await getAdsQuery();
+        for (Map<String, dynamic> ad in rawResponse['ads']) {
           try{
-            final adds = Adds.fromJson(add);
-            result.add(adds);
+            final ads = Ads.fromJson(ad);
+            result.add(ads);
           } catch(e){
-            logger.error('Failed to load add, skipping...');
+            logger.error('Failed to load ad, skipping...');
           }
         }
-        emit(state.copyWith(adds: result, isLoadingAdds: false));
+        emit(state.copyWith(ads: result, isLoadingAds: false));
       } catch(e){
-        logger.error('Failed to request adds: ${e.toString()}');
-        emit(state.copyWith(isLoadingAdds: false));
+        logger.error('Failed to request ads: ${e.toString()}');
+        emit(state.copyWith(isLoadingAds: false));
       }
     });
   }

@@ -2,37 +2,45 @@
 
 import 'package:alice/config.dart';
 
-final logger = LoggerConfig(instanceName: 'adds_model').logger;
+final logger = LoggerConfig(instanceName: 'ads_model').logger;
 
-class Adds {
-  String _addId;
+class Ads {
+  String _adId;
   String _title;
+  String _category;
   String _description;
   List<String> _tags;
   List<String> _images;
+  String? _standardProductId;
   DateTime _createdAt;
   DateTime _updatedAt;
   
-  Adds({
-    required String addId,
+  Ads({
+    required String adId,
     required String title,
+    required String category,
     required String description,
     required List<String> tags,
     required List<String> images,
+    String? standardProductId,
     required DateTime createdAt,
     required DateTime updatedAt,
-  }) : _addId = addId,
+  }) : _adId = adId,
        _title = title,
+       _category = category,
        _description = description,
        _tags = tags,
        _images = images,
+       _standardProductId = standardProductId,
        _createdAt = createdAt,
        _updatedAt = updatedAt;
 
-  String get addId => _addId;
+  String get adId => _adId;
   String get title => _title;
+  String get category => _category;
   String get description => _description;
   List<String> get images => _images;
+  String? get standardProductId => _standardProductId;
   DateTime get createdAt => _createdAt;
   DateTime get updatedAt => _updatedAt;
 
@@ -44,7 +52,7 @@ class Adds {
     return uniqueTags.toList();
   }
 
-  factory Adds.fromJson(Map<String, dynamic> json) {
+  factory Ads.fromJson(Map<String, dynamic> json) {
       try {
         final Set<String> missingElements = {};
         dynamic validateTemplate(dynamic value, dynamic defaults, String fieldName) {
@@ -55,19 +63,21 @@ class Adds {
           return value;
         }
     
-        final Adds data = Adds(
-          addId: validateTemplate(json['add_id'], '', 'addId'),
+        final Ads data = Ads(
+          adId: validateTemplate(json['ad_id'], '', 'adId'),
           title: validateTemplate(json['title'], '', 'title'),
+          category: validateTemplate(json['category'], 'General', 'category'),
           description: validateTemplate(json['description'], '', 'description'),
           tags: List<String>.from(validateTemplate(json['tags'], [], 'tags')),
           images: List<String>.from(validateTemplate(json['images'], [], 'images')),
+          standardProductId: json['standard_product_id'] as String?,
           createdAt: DateTime.parse(validateTemplate(json['createdAt'], DateTime.now().toIso8601String(), 'createdAt')),
           updatedAt: DateTime.parse(validateTemplate(json['updatedAt'], DateTime.now().toIso8601String(), 'updatedAt')),
         );
         if (missingElements.isNotEmpty) throw Exception(missingElements.join(', '));
         return data;
       } catch (e) {
-        logger.e('No enough data to load add: [${e.toString()} \n]');
+        logger.e('No enough data to load ad: [${e.toString()} \n]');
         rethrow;
       }
     }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class AddDescription extends StatelessWidget {
+class AdDescription extends StatelessWidget {
   final String description;
   final String title;
   final List<String> tags;
 
-  const AddDescription({
+  const AdDescription({
     super.key,
     required this.title,
     required this.description,
