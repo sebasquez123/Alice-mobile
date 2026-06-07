@@ -1,8 +1,8 @@
 import 'package:alice/config.dart';
 import 'package:alice/features/home/domain/index.dart';
 import 'package:alice/template/index.dart';
-import 'package:alice/widgets/shared/footer.dart';
 import 'package:alice/widgets/home/index.dart';
+import 'package:alice/widgets/shared/footer.dart';
 import 'package:flutter/material.dart';
 
 final logger = LoggerConfig(instanceName: 'Home');
@@ -22,11 +22,11 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    requestAdds();
+    requestAds();
   }
 
-  Future<void> requestAdds() async {
-    context.read<AddsBloc>().add(LoadAdds());
+  Future<void> requestAds() async {
+    context.read<AdsBloc>().add(LoadAds());
   }
 
   @override
@@ -44,8 +44,8 @@ class HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: ColorProvider.homeBackground,
         ),
-        child: BlocBuilder<AddsBloc, AddsState>(
-          builder: (context, addsState) => Stack(
+        child: BlocBuilder<AdsBloc, AdsState>(
+          builder: (context, adsState) => Stack(
             children: [
               Column(
                 children: [
@@ -55,7 +55,7 @@ class HomeScreenState extends State<HomeScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ...addsState.adds.map<Widget>((add) => Padding(
+                          ...adsState.ads.map<Widget>((add) => Padding(
                               padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,10 +63,12 @@ class HomeScreenState extends State<HomeScreen> {
                                   AddHeadline(add: add),
                                   AddImagePost(add: add),
                                   AddOptions(
+                                    add: add,
                                     onShare: () { },
                                     onQuote: () { },
+                                    onMenu: () { },
                                   ),
-                                  AddDescription(
+                                  AdDescription(
                                     title: add.title,
                                     description: add.description,
                                     tags: add.tags,
@@ -75,7 +77,7 @@ class HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             )),
-                          addsState.isLoadingAdds ? const SizedBox() : Footer(
+                          adsState.isLoadingAds ? const SizedBox() : Footer(
                             phoneNumberString: '+57 3126567098',
                             locationString: 'Mz11 Cs12 San Fernando Cuba, Pereira',
                             privacyPolicy: () { },
@@ -88,7 +90,7 @@ class HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              if(addsState.isLoadingAdds) Center(child: SpinnerProvider.spinnerLg),
+              if(adsState.isLoadingAds) Center(child: SpinnerProvider.spinnerLg),
             ]
           ),
         ),

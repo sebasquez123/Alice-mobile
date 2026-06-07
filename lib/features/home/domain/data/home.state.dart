@@ -1,23 +1,23 @@
-import 'package:alice/models/adds/adds.dart';
+import 'package:alice/models/ads/ads.dart';
 import 'package:equatable/equatable.dart';
 
-class AddsState extends Equatable {
-  final List<Adds> adds;
-  final bool isLoadingAdds;
+class AdsState extends Equatable {
+  final List<Ads> ads;
+  final bool isLoadingAds ;
 
-  const AddsState({
-    this.adds = const [],
-    this.isLoadingAdds = false,
+  const AdsState({
+    this.ads = const [],
+    this.isLoadingAds = false,
   });
 
-  AddsState copyWith({
-    List<Adds>? adds,
-    bool? isLoadingAdds,
-  }) => AddsState(
-      adds: adds ?? this.adds,
-      isLoadingAdds: isLoadingAdds ?? this.isLoadingAdds,
+  AdsState copyWith({
+    List<Ads>? ads,
+    bool? isLoadingAds,
+  }) => AdsState(
+      ads: ads ?? this.ads,
+      isLoadingAds: isLoadingAds ?? this.isLoadingAds,
     );
 
   @override
-  List<Object?> get props => [adds, isLoadingAdds];
+  List<Object?> get props => [ads, isLoadingAds];
 }

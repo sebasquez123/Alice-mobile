@@ -10,7 +10,7 @@ void main() {
   runApp(
     MultiBlocProvider (
         providers: [
-          BlocProvider<AddsBloc>(create: (_) => AddsBloc()),
+          BlocProvider<AdsBloc>(create: (_) => AdsBloc()),
           BlocProvider<InternetCheckerBloc>(create: (_) => InternetCheckerBloc())
         ],
         child: const AliceApp(),     
