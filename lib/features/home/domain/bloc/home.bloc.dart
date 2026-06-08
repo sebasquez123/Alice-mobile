@@ -21,10 +21,11 @@ class AdsBloc extends Bloc<AdsEvent, AdsState> {
             logger.error('Failed to load ad, skipping...');
           }
         }
-        emit(state.copyWith(ads: result, isLoadingAds: false));
+        logger.info('Successfully requested ads');
+        emit(state.copyWith(ads: result, isLoadingAds: false, isErrorAds: false));
       } catch(e){
         logger.error('Failed to request ads: ${e.toString()}');
-        emit(state.copyWith(isLoadingAds: false));
+        emit(state.copyWith(isLoadingAds: false, isErrorAds: true));
       }
     });
   }

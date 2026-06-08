@@ -4,8 +4,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:logger/logger.dart';
+import 'package:flutter/services.dart';
 
-Future<void> config() async {
+
+void config() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
     
@@ -36,6 +38,19 @@ Future<void> config() async {
         persistenceEnabled: false,
       );
     }
+
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light, 
+      systemNavigationBarColor: Colors.black,
+    ));
+
   } catch (e) {
     throw Exception('Error Initializing the app: $e');
   }
