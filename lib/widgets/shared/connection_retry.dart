@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
 class ConnectionRetryWidget extends StatelessWidget {
-  final Future<void> Function(BuildContext) onRetry;
-  final String message;
+  final void Function(BuildContext) onRetry;
+  final bool internetStatus;
+  final String lackInternetMessage;
+  final String genericErrorMessage;
 
   const ConnectionRetryWidget({
     super.key,
     required this.onRetry,
-    this.message = 'Ups, algo salió mal. Por favor, intenta de nuevo.',
+    required this.internetStatus,
+    required this.lackInternetMessage,
+    required this.genericErrorMessage,
   });
 
   @override
@@ -17,13 +21,13 @@ class ConnectionRetryWidget extends StatelessWidget {
         child: Column(
           children: [
             Icon(
-              Icons.wifi_off_rounded,
+              internetStatus ? Icons.car_crash_sharp : Icons.wifi_off_rounded,
               size: 100,
               color: Colors.grey.withAlpha(150),
             ),
             const SizedBox(height: 10),
             Text(
-              message,
+              !internetStatus ? lackInternetMessage : genericErrorMessage,
               style: TextStyle(
                 fontSize: 18,
                 color: Colors.grey.withAlpha(150),

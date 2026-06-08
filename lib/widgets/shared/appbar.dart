@@ -1,41 +1,30 @@
 import 'package:alice/navigator.dart';
 import 'package:alice/template/index.dart';
 import 'package:alice/widgets/home/create_post.dart';
-import 'package:alice/widgets/shared/index.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 
 class AppBarWidget extends StatefulWidget {
-  final TextEditingController? searchController;
-  const AppBarWidget({this.searchController, super.key});
+  const AppBarWidget({super.key});
 
   @override
   AppBarState createState() => AppBarState();
 }
 
 class AppBarState extends State<AppBarWidget> {
-
-  final FocusNode searchFocusNode = FocusNode(debugLabel: 'SearchBarFocus');
-  
   late final GoRouterDelegate _router;
-  bool searchBarHasText = false;
 
   @override
   void initState() {
     super.initState();
     _router = GoRouter.of(context).routerDelegate;
-    widget.searchController?.addListener(_onChangeSearch);
   }
 
-  void _onChangeSearch() => setState(() => searchBarHasText = widget.searchController?.text.isNotEmpty ?? false);
 
   @override
   void dispose() {
-
-    widget.searchController?.removeListener(_onChangeSearch);
-    searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -88,13 +77,6 @@ class AppBarState extends State<AppBarWidget> {
               ),
             ),
           ),
-          widget.searchController != null ? 
-          SearchField(
-            searchController: widget.searchController, 
-            searchFocusNode: searchFocusNode, 
-            hasText: searchBarHasText, 
-            onClear: () => widget.searchController?.clear()
-          ) : const SizedBox(),
           AnimatedBuilder(
             animation: _router,
             builder: (context, _) {

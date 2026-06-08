@@ -8,6 +8,7 @@ class Footer extends StatelessWidget {
   final Function location;
   final String phoneNumberString;
   final String locationString;
+  final double height;
 
   const Footer({
     super.key,
@@ -16,11 +17,12 @@ class Footer extends StatelessWidget {
     required this.location,
     required this.phoneNumberString,
     required this.locationString,
+    this.height = 0.25,
   });
 
   @override
   Widget build(BuildContext context) => Container(
-      height: MediaQuery.of(context).size.height * 0.25,
+      height: MediaQuery.of(context).size.height * height,
       width: double.infinity,
       color: const Color(0xFF531900),
       child: Row(

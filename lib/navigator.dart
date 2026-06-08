@@ -45,16 +45,16 @@ final List<PageStack> pageObjects = [
       iconToolTip: 'Go Home',
     ),
     PageStack(
-      pageName: Routes.quotation.replaceAll('/', ''),
-      pageIcon: shopIcon,
-      pageRedirectPath: Routes.quotation,
-      iconToolTip: 'Go Quotation',
-    ),
-    PageStack(
       pageName: Routes.catalog.replaceAll('/', ''),
       pageIcon: bookIcon,
       pageRedirectPath: Routes.catalog,
       iconToolTip: 'Go Catalog',
+    ),
+    PageStack(
+      pageName: Routes.quotation.replaceAll('/', ''),
+      pageIcon: shopIcon,
+      pageRedirectPath: Routes.quotation,
+      iconToolTip: 'Go Quotation',
     ),
     PageStack(
       pageName: Routes.orders.replaceAll('/', ''),
@@ -77,9 +77,8 @@ final GoRouter router = GoRouter(
       name: Routes.home,
       path: Routes.home,
       pageBuilder: (context, state) => CustomTransitionPage(
-        child: _AppNavigator(
-          searchController: searchController,
-          child: const HomeScreen(),
+        child: const _AppNavigator(
+          child: HomeScreen(),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
         FadeTransition(opacity: animation, child: child)
@@ -90,7 +89,6 @@ final GoRouter router = GoRouter(
       path: Routes.signIn,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: const _AppNavigator(
-          searchController: null,
           child: LoginScreen(),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
@@ -102,7 +100,6 @@ final GoRouter router = GoRouter(
       path: Routes.quotation,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: const _AppNavigator(
-          searchController: null,
           child: QuotationScreen(),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
@@ -114,7 +111,6 @@ final GoRouter router = GoRouter(
       path: Routes.orders,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: const _AppNavigator(
-          searchController: null,
           child: InvoiceScreen(),
         ),
         transitionsBuilder:  (context, animation, secondaryAnimation, child) => 
@@ -126,7 +122,6 @@ final GoRouter router = GoRouter(
       path: Routes.catalog,
       pageBuilder: (context, state) => CustomTransitionPage(
         child: _AppNavigator(
-          searchController: null,
           child: MultiBlocProvider(
             providers: [
               BlocProvider<CatalogMostrarioBloc>(create: (_) => CatalogMostrarioBloc()),
@@ -145,17 +140,15 @@ final GoRouter router = GoRouter(
 
 class _AppNavigator extends StatelessWidget {
   final Widget child;
-  final TextEditingController? searchController;
   const _AppNavigator({
     required this.child,
-    required this.searchController,
   });
 
   @override
   Widget build(BuildContext context) => PopScope(
     canPop: false,
     onPopInvokedWithResult: (didpop, result) async => leaveAppFromNative(context, didpop),
-    child: CoreScaffold(searchController: searchController, child: child),
+    child: CoreScaffold(child: child),
   );
 }
 

@@ -23,7 +23,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
   bool isMostrarios = true;
   String? selectedCategory;
-  String searchQuery = '';
+  String searchString = '';
   FocusNode searchFocusNode = FocusNode(debugLabel: 'CatalogSearchBarFocus');
   bool searchBarHasText = false;
   TextEditingController searchController = TextEditingController();
@@ -41,7 +41,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
   void _onChangeSearch() => setState(() {
     searchBarHasText = searchController.text.isNotEmpty;
-    searchQuery = searchController.text.toLowerCase();
+    searchString = searchController.text.toLowerCase();
   });
 
   Future<void> _loadMostrarios(BuildContext context) async {
@@ -67,13 +67,13 @@ class _CatalogScreenState extends State<CatalogScreen> {
   }
 
   Map<String, dynamic> _filterGroupedBySearch(Map<String, dynamic> grouped) {
-    if (searchQuery.isEmpty) return grouped;
+    if (searchString.isEmpty) return grouped;
     
     final filtered = <String, dynamic>{};
     grouped.forEach((category, items) {
       final filteredItems = (items as List).where((item) {
         final name = (item.title ?? '') as String;
-        return name.toLowerCase().contains(searchQuery);
+        return name.toLowerCase().contains(searchString);
       }).toList();
       if (filteredItems.isNotEmpty) {
         filtered[category] = filteredItems;
@@ -107,7 +107,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                           final groupedProducts = _filterGroupedBySearch(groupByCategory(productsState.products));
                           final categories = _getCategories(isMostrarios, groupedMostrarios).toList();
 
-                          final bool searchIsNotFound = groupedProducts.isEmpty && isProductsLoaded && !failedRequest && searchQuery.isNotEmpty;
+                          final bool searchIsNotFound = groupedProducts.isEmpty && isProductsLoaded && !failedRequest && searchString.isNotEmpty;
                           final bool needRetry = failedRequest && !productsState.isLoadingProducts && !mostrariosState.isLoadingMostrario;
 
                           return Stack(
@@ -162,18 +162,18 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                 ),
                                               if(isProductsLoaded)
                                                 ...buildGroupedProductList(
-                                                  groupedProducts: selectedCategory == null
-                                                      ? groupedProducts
-                                                      : {selectedCategory!: groupedProducts[selectedCategory!] ?? []},
+                                                  groupedProducts: groupedProducts
                                                 ),
                                               if(needRetry)
                                                 ConnectionRetryWidget(
                                                   onRetry: _onRetry,
-                                                  message: !internetOn ? lackInternetConnectionStatus : genericErrorStatus,
+                                                  internetStatus: internetOn,
+                                                  lackInternetMessage: lackInternetConnectionStatus,
+                                                  genericErrorMessage: genericErrorStatus,
                                                 ),
                                               if(searchIsNotFound)
                                                 NotFoundWidget(
-                                                  itemName: searchQuery,
+                                                  itemName: searchString,
                                                   icon: Icons.search_off_rounded,
                                                   boxSize: MediaQuery.sizeOf(context).height*0.55,
                                                 ),
